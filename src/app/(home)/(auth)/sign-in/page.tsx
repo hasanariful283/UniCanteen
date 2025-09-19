@@ -1,11 +1,14 @@
-"use client"
+"use client";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import React from "react";
 
-const SignIn = () => {
+export default function SignIn() {
     const router = useRouter();
-    router.push("/");
-    return <div>Redirecting to Home Page @parvezhossainme </div>;
-};
 
-export default SignIn;
+    useEffect(() => {
+        // Use replace to avoid adding an extra history entry
+        router.replace("/");
+    }, [router]);
+
+    return <div className="p-6 text-gray-600">Redirecting to Home Page…</div>;
+}

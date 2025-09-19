@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,14 @@ type Conversation = {
 type Message = { id: string; content: string; createdAt: string; sender: User };
 
 export default function MessagesPage() {
+    return (
+        <Suspense fallback={<div className="p-6 text-gray-600">Loading messages…</div>}>
+            <MessagesPageInner />
+        </Suspense>
+    );
+}
+
+function MessagesPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const selectedIdFromUrl = searchParams.get("c");
