@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 // Notification Icon add
 import { BellIcon } from "@heroicons/react/24/outline";
@@ -13,10 +14,16 @@ import {
 
 const CanNavBar = () => {
     return (
-        <header className="flex justify-between p-4 bg-amber-100 h-20">
-            <div className="text-2xl font-bold py-1">
-                <Link href="/">UNICANTEEN LOGO</Link>
-            </div>
+        <header className="flex items-center justify-between px-6 bg-[#f79256] h-20 border-b border-black/70">
+            <Link href="/">
+                <Image
+                    src="/UniCanteen_L.png"
+                    alt="UniCanteen Logo"
+                    className="object-cover h-20"
+                    width={300}
+                    height={5}
+                />
+            </Link>
             <div>
                 {/* Search Bar */}
                 <input

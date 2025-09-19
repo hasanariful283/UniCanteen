@@ -20,6 +20,10 @@ model User {
   canteens        Canteen[]
   Customer        Customer?
   DeliveryPerson   DeliveryPerson?
+
+  // Messaging relations
+  conversationParticipants ConversationParticipant[]
+  messages                 Message[]
 }
 
 enum RoleType {
@@ -48,7 +52,8 @@ model Canteen {
   reviews     CanteenReviews[]
   CanteenFood CanteenFood[]
 
-  orders Order[]
+  // orders Order[]
+  OrderFoodItem OrderFoodItem[]
 }
 
 enum FoodCategory {
@@ -84,6 +89,7 @@ model CanteenFood {
   canteen       Canteen         @relation(fields: [canteenId], references: [id])
   featuredItems FeaturedItems[]
   cartItems     CartItem[]
+  OrderFoodItem OrderFoodItem[]
 }
 
 // model CanteenReviews {
@@ -155,7 +161,6 @@ model CartItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // cart Cart        @relation(fields: [cartId], references: [id])
   cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
   food CanteenFood @relation(fields: [foodId], references: [id])
   @@unique([cartId, foodId])
@@ -202,7 +207,6 @@ model DeliveryProfile {
   cancelled   Int     @default(0)
 
   deliveryPerson DeliveryPerson @relation(fields: [userId], references: [userId])
-  // user      User               @relation(fields: [userId], references: [id])
   timeSlots DeliveryTimeSlot[]
 }
 
@@ -216,19 +220,94 @@ model DeliveryTimeSlot {
   delivery DeliveryProfile @relation(fields: [deliveryId], references: [id])
 }
 
-model Order {
-  id         String      @id @default(cuid())
-  customerId String
-  canteenId  String
-  foodItems  Json
-  status     OrderStatus @default(PENDING)
-  totalPrice Float
-  assignedTo String?
-  deliveryAt DateTime?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+// model Order {
+//   id         String      @id @default(cuid())
+//   customerId String
+//   canteenId  String
+//   foodItems  Json
+//   status     OrderStatus @default(PENDING)
+//   totalPrice Float
+//   assignedTo String?
+//   deliveryAt DateTime?
+//   createdAt  DateTime    @default(now())
+//   updatedAt  DateTime    @updatedAt
 
-  customer    Customer @relation("CustomerOrders", fields: [customerId], references: [userId])
-  canteen     Canteen  @relation(fields: [canteenId], references: [id])
-  deliveryMan DeliveryPerson? @relation("OrderDeliveryMan", fields: [assignedTo], references: [userId])
+//   customer    Customer @relation("CustomerOrders", fields: [customerId], references: [userId])
+//   canteen     Canteen  @relation(fields: [canteenId], references: [id])
+//   deliveryMan DeliveryPerson? @relation("OrderDeliveryMan", fields: [assignedTo], references: [userId])
+// }
+model Order {
+  id         String        @id @default(cuid())
+  customerId String
+  status     OrderStatus   @default(PENDING)
+  totalPrice Float
+  deliveryAt DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  assignedTo String?
+
+  customer   Customer          @relation("CustomerOrders", fields: [customerId], references: [userId])
+  foodItems  OrderFoodItem[]   // individual items from potentially different canteens
+  deliveryMan DeliveryPerson?  @relation("OrderDeliveryMan", fields: [assignedTo], references: [userId])
+
+  // Messaging relation (one order may have one or more conversations)
+  conversations Conversation[]
+}
+
+model OrderFoodItem {
+  id        String       @id @default(cuid())
+  orderId   String
+  foodId    String
+  canteenId String
+  quantity  Int           @default(1)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  order    Order         @relation(fields: [orderId], references: [id])
+  food     CanteenFood   @relation(fields: [foodId], references: [id])
+  canteen  Canteen       @relation(fields: [canteenId], references: [id])
+}
+
+// --------------------------Messaging--------------------------
+
+enum MessageType {
+  TEXT
+  IMAGE
+  SYSTEM
+}
+
+model Conversation {
+  id         String    @id @default(cuid())
+  orderId    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  order        Order?                   @relation(fields: [orderId], references: [id])
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String   @id @default(cuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime @default(now())
+  lastReadAt     DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  senderId       String
+  type           MessageType @default(TEXT)
+  content        String
+  createdAt      DateTime    @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
 }

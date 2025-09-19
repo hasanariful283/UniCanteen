@@ -14,8 +14,8 @@ import {
 
 const HomeNavBar = () => {
     return (
-        <header className="flex justify-between p-2 bg-[#f79256] h-20">
-            <Link href="/">
+        <header className="flex items-center justify-between px-6 bg-[#f79256] h-20 border-b border-black/70">
+            {/* <Link href="/"> */}
                 <Image
                     src="/UniCanteen_L.png"
                     alt="UniCanteen Logo"
@@ -23,7 +23,7 @@ const HomeNavBar = () => {
                     width={300}
                     height={5}
                 />
-            </Link>
+            {/* </Link> */}
 
             <nav className="flex items-center">
                 <BellIcon className="text-red-700 mr-4 border rounded-full h-10 w-10 p-1 " />

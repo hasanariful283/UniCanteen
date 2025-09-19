@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { CartItem } from "@/types/cart-types";
 
-
-
 export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,49 +24,73 @@ export default function CartPage() {
         0
     );
 
-        async function updateQuantity(cartItemId: string, nextQty: number) {
-            // optimistic update
-            const prev = cartItems;
-            setUpdatingId(cartItemId);
-            setCartItems((items) =>
-                items
-                    .map((it) => (it.id === cartItemId ? { ...it, quantity: nextQty } : it))
-                    .filter((it) => it.quantity > 0)
-            );
-            try {
-                const res = await fetch("/api/cart/update-quantity", {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ cartItemId, quantity: nextQty }),
-                });
-                if (!res.ok) {
-                    throw new Error((await res.json()).error || "Failed to update");
-                }
-            } catch (e) {
-                // rollback
-                setCartItems(prev);
-            } finally {
-                setUpdatingId(null);
+    async function updateQuantity(cartItemId: string, nextQty: number) {
+        // optimistic update
+        const prev = cartItems;
+        setUpdatingId(cartItemId);
+        setCartItems((items) =>
+            items
+                .map((it) =>
+                    it.id === cartItemId ? { ...it, quantity: nextQty } : it
+                )
+                .filter((it) => it.quantity > 0)
+        );
+        try {
+            const res = await fetch("/api/cart/update-quantity", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cartItemId, quantity: nextQty }),
+            });
+            if (!res.ok) {
+                throw new Error((await res.json()).error || "Failed to update");
             }
+        } catch (e) {
+            // rollback
+            setCartItems(prev);
+        } finally {
+            setUpdatingId(null);
         }
+    }
 
-        async function removeItem(cartItemId: string) {
-            const prev = cartItems;
-            setUpdatingId(cartItemId);
-            setCartItems((items) => items.filter((it) => it.id !== cartItemId));
-            try {
-                const res = await fetch(`/api/cart/remove-item?cartItemId=${cartItemId}`, {
+    async function removeItem(cartItemId: string) {
+        const prev = cartItems;
+        setUpdatingId(cartItemId);
+        setCartItems((items) => items.filter((it) => it.id !== cartItemId));
+        try {
+            const res = await fetch(
+                `/api/cart/remove-item?cartItemId=${cartItemId}`,
+                {
                     method: "DELETE",
-                });
-                if (!res.ok) {
-                    throw new Error((await res.json()).error || "Failed to remove");
                 }
-            } catch (e) {
-                setCartItems(prev);
-            } finally {
-                setUpdatingId(null);
+            );
+            if (!res.ok) {
+                throw new Error((await res.json()).error || "Failed to remove");
             }
+        } catch (e) {
+            setCartItems(prev);
+        } finally {
+            setUpdatingId(null);
         }
+    }
+    // order creating parvezhossainme
+    async function checkout() {
+        if (updatingId) return;
+        setUpdatingId("checkout");
+        try {
+            const res = await fetch("/api/orders/create", { method: "POST" });
+            if (!res.ok)
+                throw new Error((await res.json()).error || "Checkout failed");
+            const { order } = await res.json();
+            // Clear UI cart
+            setCartItems([]);
+            // Optionally navigate to an order summary page later
+            // router.push(`/orders/${order.id}`)
+        } catch (e) {
+            // noop or show toast
+        } finally {
+            setUpdatingId(null);
+        }
+    }
 
     return (
         <div className="container mx-auto p-6">
@@ -88,23 +110,31 @@ export default function CartPage() {
                 <div className="lg:flex lg:gap-8">
                     {/* Cart Items */}
                     <div className="flex-1 space-y-4">
-                                                {cartItems.map((item) => (
+                        {cartItems.map((item) => (
                             <div
                                 key={item.id}
-                                                        className="flex gap-4 bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition relative"
+                                className="flex gap-4 bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition relative"
                             >
                                 <div className="w-28 h-28 relative flex-shrink-0">
-                                    <Image
-                                        src={
-                                            item.food?.image ||
-                                            "/default-food.jpg"
-                                        }
-                                        alt={item.food?.name}
-                                        fill
-                                        className="object-cover rounded-lg"
-                                    />
+                                    <div className="relative w-32 h-32">
+                                        <div className="relative w-32 h-32">
+                                            <Image
+                                                src={
+                                                    item.food?.image ||
+                                                    "/default-food.jpg"
+                                                }
+                                                alt={
+                                                    item.food?.name ||
+                                                    "Food Image"
+                                                }
+                                                fill
+                                                sizes="128px" // size of the image container
+                                                className="object-cover rounded-lg"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                                        <div className="flex-1 flex flex-col justify-between">
+                                <div className="flex-1 flex flex-col justify-between">
                                     <div>
                                         <div className="flex items-center justify-between mb-1">
                                             <h2 className="text-lg font-semibold text-gray-900 line-clamp-1">
@@ -123,43 +153,70 @@ export default function CartPage() {
                                             {item.food?.description || ""}
                                         </p>
                                     </div>
-                                                            <div className="flex items-center justify-between mt-2">
-                                                                {/* Quantity controls */}
-                                                                <div className="flex items-center gap-3">
-                                                                    <button
-                                                                        aria-label="Decrease quantity"
-                                                                        disabled={updatingId === item.id}
-                                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                                        className="w-8 h-8 rounded-full border flex items-center justify-center text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                                                                    >
-                                                                        −
-                                                                    </button>
-                                                                    <span className="min-w-8 text-center font-semibold">{item.quantity}</span>
-                                                                    <button
-                                                                        aria-label="Increase quantity"
-                                                                        disabled={updatingId === item.id}
-                                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                        className="w-8 h-8 rounded-full border flex items-center justify-center text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                                                                    >
-                                                                        +
-                                                                    </button>
-                                                                </div>
-                                                                {/* Right side: line total and delete */}
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="text-right">
-                                                                        <div className="text-xs text-gray-500">৳{item.food?.price} × {item.quantity}</div>
-                                                                        <div className="text-green-600 font-bold text-lg">৳{(item.food?.price || 0) * item.quantity}</div>
-                                                                    </div>
-                                                                    <button
-                                                                        aria-label="Remove item"
-                                                                        disabled={updatingId === item.id}
-                                                                        onClick={() => removeItem(item.id)}
-                                                                        className="text-red-500 hover:text-red-600 text-xl font-bold transition disabled:opacity-50"
-                                                                    >
-                                                                        &times;
-                                                                    </button>
-                                                                </div>
-                                                            </div>
+                                    <div className="flex items-center justify-between mt-2">
+                                        {/* Quantity controls */}
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                aria-label="Decrease quantity"
+                                                disabled={
+                                                    updatingId === item.id
+                                                }
+                                                onClick={() =>
+                                                    updateQuantity(
+                                                        item.id,
+                                                        item.quantity - 1
+                                                    )
+                                                }
+                                                className="w-8 h-8 rounded-full border flex items-center justify-center text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                                            >
+                                                −
+                                            </button>
+                                            <span className="min-w-8 text-center font-semibold">
+                                                {item.quantity}
+                                            </span>
+                                            <button
+                                                aria-label="Increase quantity"
+                                                disabled={
+                                                    updatingId === item.id
+                                                }
+                                                onClick={() =>
+                                                    updateQuantity(
+                                                        item.id,
+                                                        item.quantity + 1
+                                                    )
+                                                }
+                                                className="w-8 h-8 rounded-full border flex items-center justify-center text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                        {/* Right side: line total and delete */}
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right">
+                                                <div className="text-xs text-gray-500">
+                                                    ৳{item.food?.price} ×{" "}
+                                                    {item.quantity}
+                                                </div>
+                                                <div className="text-green-600 font-bold text-lg">
+                                                    ৳
+                                                    {(item.food?.price || 0) *
+                                                        item.quantity}
+                                                </div>
+                                            </div>
+                                            <button
+                                                aria-label="Remove item"
+                                                disabled={
+                                                    updatingId === item.id
+                                                }
+                                                onClick={() =>
+                                                    removeItem(item.id)
+                                                }
+                                                className="text-red-500 hover:text-red-600 text-xl font-bold transition disabled:opacity-50"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -183,14 +240,20 @@ export default function CartPage() {
                             <span>Total</span>
                             <span className="text-green-600">৳{total}</span>
                         </div>
-                        <button className="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg text-lg transition">
-                            Proceed to Checkout
+                        <button
+                            onClick={checkout}
+                            disabled={updatingId === "checkout"}
+                            className="mt-6 w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-lg text-lg transition"
+                        >
+                            {updatingId === "checkout"
+                                ? "Placing order..."
+                                : "Proceed to Checkout"}
                         </button>
                     </div>
                 </div>
             )}
         </div>
     );
-};
+}
 
 // export default CartPage;

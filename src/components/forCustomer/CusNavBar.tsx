@@ -33,6 +33,9 @@ const CusNavBar = () => {
                     <li>
                         <Link href="/customer-home">Home</Link>
                     </li>
+                    <li>
+                        <Link href="/customer-home/messages">Messages</Link>
+                    </li>
                     <li className="relative group">
                         <button className="flex items-center gap-1 focus:outline-none">
                             Orders <span className="text-xs">▼</span>

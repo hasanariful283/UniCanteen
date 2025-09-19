@@ -140,6 +140,8 @@ const Home = () => {
                         fill
                         className="object-cover"
                         priority={index === 0}
+                        sizes="100vw"
+                        
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
@@ -192,6 +194,10 @@ const Home = () => {
                     alt={canteen.name}
                     fill
                     className="object-cover"
+                    priority
+                    sizes="(max-width: 768px) 100vw,
+                    (max-width: 1200px) 50vw,
+                    33vw"
                   />
                   {/* Status Badge */}
                   <div className="absolute top-4 right-4">
