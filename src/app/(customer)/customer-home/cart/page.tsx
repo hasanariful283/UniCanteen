@@ -1,25 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { CartItem } from "@/types/cart-types";
 
-type CartItem = {
-    id: string;
-    quantity: number;
-    food: {
-        id: string;
-        name: string;
-        price: number;
-        image?: string;
-        description?: string;
-        canteen?: {
-            id: string;
-            name: string;
-            canteen_image?: string;
-        };
-    };
-};
 
-export const CartPage = () => {
+
+export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -207,4 +193,4 @@ export const CartPage = () => {
     );
 };
 
-export default CartPage;
+// export default CartPage;
