@@ -1,47 +1,106 @@
-"use client";
-
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { Bell, Search, ShoppingCart } from "lucide-react";
+import React from "react";
+import Image from "next/image";
+import {
+    BellIcon,
+    HeartIcon,
+    ShoppingBagIcon,
+} from "@heroicons/react/24/outline";
+import {
+    SignedIn,
+    SignedOut,
+    SignInButton,
+    SignUpButton,
+    UserButton,
+} from "@clerk/nextjs";
 
-export default function CusNavBar() {
+const CusNavBar = () => {
     return (
-        <nav className="bg-white dark:bg-gray-800 border-b h-20">
-            <div className="mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo and Brand */}
-                    <div className="flex items-center">
-                        <Link 
-                            href="/customer" 
-                            className="text-xl font-bold text-gray-800 dark:text-white"
-                        >
-                            UniCanteen
-                        </Link>
-                    </div>
+        <header className="flex items-center justify-between px-6 bg-[#f79256] h-20 border-b border-black/70">
+            <Link href="/">
+                <Image
+                    src="/UniCanteen_L.png"
+                    alt="UniCanteen Logo"
+                    className="object-cover h-20"
+                    width={300}
+                    height={5}
+                />
+            </Link>
 
-                    {/* Right Side Items */}
-                    <div className="flex items-center space-x-4">
-                        {/* Cart */}
-                        <Link href="/customer-home/cart" className="relative">
-                            <ShoppingCart className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                2
-                            </span>
-                        </Link>
-
-                        {/* Notifications */}
-                        <button className="relative">
-                            <Bell className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                3
-                            </span>
+            {/* Center Nav Links */}
+            <nav className="flex-1 flex justify-center">
+                <ul className="flex gap-8 items-center text-lg font-medium">
+                    <li>
+                        <Link href="/customer-home">Home</Link>
+                    </li>
+                    <li className="relative group">
+                        <button className="flex items-center gap-1 focus:outline-none">
+                            Orders <span className="text-xs">▼</span>
                         </button>
+                        <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-white shadow rounded z-10 min-w-[120px]">
+                            <Link
+                                href="/customer-home/orders/ongoing"
+                                className="block px-4 py-2 hover:bg-orange-100"
+                            >
+                                Ongoing
+                            </Link>
+                            <Link
+                                href="/customer-home/orders/completed"
+                                className="block px-4 py-2 hover:bg-orange-100"
+                            >
+                                Completed
+                            </Link>
+                        </div>
+                    </li>
+                    <li>
+                        <Link href="/customer-home/blog">Blog</Link>
+                    </li>
+                    <li>
+                        <Link href="/customer-home/about">About</Link>
+                    </li>
+                </ul>
+            </nav>
 
-                        {/* User Profile */}
-                        <UserButton afterSignOutUrl="/" />
-                    </div>
+            {/* Right Side Icons */}
+            <div className="flex items-center gap-6">
+                <Link href="/wishlist" className="hover:text-orange-700">
+                    <HeartIcon className="w-7 h-7" />
+                </Link>
+                <Link
+                    href="/customer-home/cart"
+                    className="hover:text-orange-700"
+                >
+                    <ShoppingBagIcon className="w-7 h-7" />
+                </Link>
+                <div className="relative">
+                    <BellIcon className="w-7 h-7 hover:text-orange-700" />
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5">
+                        9
+                    </span>
+                </div>
+                <div>
+                    <SignedOut>
+                        <SignInButton mode="modal">
+                            <button className="signBtn">Sign In</button>
+                        </SignInButton>
+                        <SignUpButton mode="modal">
+                            <button className="signBtn ml-2">Sign Up</button>
+                        </SignUpButton>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton
+                            appearance={{
+                                elements: {
+                                    userButtonAvatarBox: "h-10 w-10",
+                                },
+                            }}
+                            showName={false}
+                        />
+                    </SignedIn>
                 </div>
             </div>
-        </nav>
+        </header>
     );
-}
+};
+
+export default CusNavBar;

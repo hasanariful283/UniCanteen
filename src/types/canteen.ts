@@ -30,3 +30,31 @@ export interface CanteenDetails {
         stocks: number;
     }[];
 }
+
+export type Food = {
+    id: string;
+    name: string;
+    price: number;
+    description?: string;
+    image?: string;
+    stocks: number;
+    availability: boolean;
+    category: string[];
+    rating?: number;
+};
+
+export const CATEGORY_LABELS: Record<string, string> = {
+    POPULAR: "Popular",
+    BREAKFAST: "Breakfast",
+    LUNCH: "Lunch",
+    DINNER: "Dinner",
+    FAST_FOOD: "Fast Foods",
+    DESSERT: "Dessert",
+    BEVERAGE: "Drinks",
+    SNACK: "Snacks",
+    RICE_ITEMS: "Rice Items",
+    DRINKS: "Drinks",
+    PACKET_ITEMS: "Packet Items",
+    OTHERS: "Others",
+    MEAT_ITEMS: "Meat Items",
+};

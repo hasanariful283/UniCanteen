@@ -1,40 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-
-type Food = {
-    id: string;
-    name: string;
-    price: number;
-    description?: string;
-    image?: string;
-    stocks: number;
-    availability: boolean;
-    category: string[];
-    rating?: number;
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-    POPULAR: "Popular",
-    BREAKFAST: "Breakfast",
-    LUNCH: "Lunch",
-    DINNER: "Dinner",
-    FAST_FOOD: "Fast Foods",
-    DESSERT: "Dessert",
-    BEVERAGE: "Drinks",
-    SNACK: "Snacks",
-    RICE_ITEMS: "Rice Items",
-    DRINKS: "Drinks",
-    PACKET_ITEMS: "Packet Items",
-    OTHERS: "Others",
-    MEAT_ITEMS: "Meat Items",
-};
+import { Food, CATEGORY_LABELS } from "@/types/canteen";
 
 const NeptuneCafePage = () => {
     const [foods, setFoods] = useState<Food[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<string>("ALL");
+    const [addingId, setAddingId] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchFoods() {
@@ -128,7 +102,7 @@ const NeptuneCafePage = () => {
             {/* Food Cards */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-b-4 mb-4"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 mb-4"></div>
                     <p className="text-lg text-gray-500">Loading foods...</p>
                 </div>
             ) : filteredFoods.length === 0 ? (
@@ -177,8 +151,48 @@ const NeptuneCafePage = () => {
                                     <span>★</span>
                                     <span>{food.rating ?? "5.0"}</span>
                                 </div>
-                                <button className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-600 transition">
-                                    + Add Product
+                                <button
+                                    className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-600 transition disabled:opacity-60"
+                                    disabled={
+                                        !food.availability ||
+                                        food.stocks === 0 ||
+                                        addingId === food.id
+                                    }
+                                    onClick={async () => {
+                                        setAddingId(food.id);
+                                        try {
+                                            const res = await fetch(
+                                                "/api/cart/add-to-cart",
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type":
+                                                            "application/json",
+                                                    },
+                                                    body: JSON.stringify({
+                                                        foodId: food.id,
+                                                        quantity: 1,
+                                                    }),
+                                                }
+                                            );
+                                            if (!res.ok) {
+                                                const data = await res.json();
+                                                alert(
+                                                    data.error ||
+                                                        "Failed to add to cart"
+                                                );
+                                            }
+                                            // Optionally: show toast, update cart UI, etc.
+                                        } catch (err) {
+                                            alert("Failed to add to cart");
+                                        } finally {
+                                            setAddingId(null);
+                                        }
+                                    }}
+                                >
+                                    {addingId === food.id
+                                        ? "Adding..."
+                                        : "+ Add Product"}
                                 </button>
                             </div>
                             <div className="flex justify-between items-center mt-1">

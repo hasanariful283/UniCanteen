@@ -11,7 +11,7 @@ model User {
   id        String   @id
   email     String?  @unique
   name      String?
-  phone     String?  @unique
+  phone     String? // @unique
   studentId String?
   userRole  RoleType @default(CUSTOMER)
   createdAt DateTime @default(now())
@@ -19,11 +19,7 @@ model User {
 
   canteens        Canteen[]
   Customer        Customer?
-  DeliveryProfile DeliveryProfile?
-
-  // relations with Order
-  ordersPlaced Order[] @relation("CustomerOrders") // user as customer
-  deliveries   Order[] @relation("OrderDeliveryMan") // user as delivery person
+  DeliveryPerson   DeliveryPerson?
 }
 
 enum RoleType {
@@ -87,27 +83,47 @@ model CanteenFood {
   category      FoodCategory[]
   canteen       Canteen         @relation(fields: [canteenId], references: [id])
   featuredItems FeaturedItems[]
+  cartItems     CartItem[]
 }
 
+// model CanteenReviews {
+//   canteenId String   @id
+//   rating    Int
+//   comment   String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   canteen Canteen @relation(fields: [canteenId], references: [id])
+// }
+
 model CanteenReviews {
-  canteenId String   @id
+  id        String   @id @default(cuid())
+  canteenId String
+  userId    String
   rating    Int
   comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   canteen Canteen @relation(fields: [canteenId], references: [id])
+  customer    Customer    @relation(fields: [userId], references: [userId])
+
+  @@unique([canteenId, userId])
 }
 
 model Customer {
-  id        String   @id
-  userId    String   @unique
-  uiuId     String   @unique
+  userId    String   @id
+  uiuId     String   // @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  ordersPlaced Order[] @relation("CustomerOrders")
+  user         User    @relation(fields: [userId], references: [id])
+  cart         Cart?
+  canteenReviews CanteenReviews[]
 }
+
+
 
 model FeaturedItems {
   id          String      @id @default(cuid())
@@ -117,6 +133,32 @@ model FeaturedItems {
   food        CanteenFood @relation(fields: [foodId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+// --------------------------Order And Cart--------------------------\
+
+model Cart {
+  id         String   @id @default(cuid())
+  customerId String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer Customer   @relation(fields: [customerId], references: [userId])
+  items    CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  foodId    String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // cart Cart        @relation(fields: [cartId], references: [id])
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  food CanteenFood @relation(fields: [foodId], references: [id])
+  @@unique([cartId, foodId])
 }
 
 enum WeekDay {
@@ -137,6 +179,20 @@ enum OrderStatus {
   CANCELLED
 }
 
+
+model DeliveryPerson {
+  userId    String   @id
+  uiuId     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  DeliveryProfile DeliveryProfile?
+
+  // relations with Order
+  deliveries Order[] @relation("OrderDeliveryMan") // user as delivery person
+}
+
 model DeliveryProfile {
   id          String  @id @default(cuid())
   userId      String  @unique
@@ -145,7 +201,8 @@ model DeliveryProfile {
   completed   Int     @default(0)
   cancelled   Int     @default(0)
 
-  user      User               @relation(fields: [userId], references: [id])
+  deliveryPerson DeliveryPerson @relation(fields: [userId], references: [userId])
+  // user      User               @relation(fields: [userId], references: [id])
   timeSlots DeliveryTimeSlot[]
 }
 
@@ -171,7 +228,7 @@ model Order {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
-  customer    User    @relation("CustomerOrders", fields: [customerId], references: [id])
-  canteen     Canteen @relation(fields: [canteenId], references: [id])
-  deliveryMan User?   @relation("OrderDeliveryMan", fields: [assignedTo], references: [id])
+  customer    Customer @relation("CustomerOrders", fields: [customerId], references: [userId])
+  canteen     Canteen  @relation(fields: [canteenId], references: [id])
+  deliveryMan DeliveryPerson? @relation("OrderDeliveryMan", fields: [assignedTo], references: [userId])
 }

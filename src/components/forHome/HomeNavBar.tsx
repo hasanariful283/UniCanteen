@@ -14,7 +14,7 @@ import {
 
 const HomeNavBar = () => {
     return (
-        <header className="flex justify-between p-2 bg-amber-100 h-20">
+        <header className="flex justify-between p-2 bg-[#f79256] h-20">
             <Link href="/">
                 <Image
                     src="/UniCanteen_L.png"

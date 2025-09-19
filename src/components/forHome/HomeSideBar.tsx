@@ -43,7 +43,7 @@ export default function HomeSideBar() {
     };
 
     return (
-        <div className="pr-4">
+        <div className="pr-4 ">
             <div
                 className={cn(
                     isSidebarExpanded ? "w-[200px]" : "w-[68px]",
@@ -52,7 +52,7 @@ export default function HomeSideBar() {
             >
                 <aside className="flex h-full flex-col w-full break-words px-4 overflow-x-hidden columns-1">
                     {navSections.map((section, sIdx) => (
-                        <div key={sIdx} className="mb-4">
+                        <div key={sIdx} className="mb-4 ">
                             <div className="text-xs font-semibold text-muted-foreground uppercase mb-2 mt-4 tracking-wide">
                                 {
                                     isSidebarExpanded
@@ -60,7 +60,7 @@ export default function HomeSideBar() {
                                         : ""
                                 }
                             </div>
-                            <div className="flex flex-col space-y-1">
+                            <div className="flex flex-col space-y-1 ">
                                 {section.items.map((item, idx) => (
                                     <Fragment key={idx}>
                                         <SideNavItem
