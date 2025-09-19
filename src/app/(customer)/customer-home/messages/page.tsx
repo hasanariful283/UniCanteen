@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
 
 type User = { id: string; name?: string | null; email?: string | null };
 type Participant = { id: string; userId: string; user: User };
@@ -31,6 +32,7 @@ function MessagesPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const selectedIdFromUrl = searchParams.get("c");
+    const { user } = useUser();
 
     const [loading, setLoading] = useState(true);
     const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -204,17 +206,33 @@ function MessagesPageInner() {
                                     .join(", ")}
                             </div>
                         </header>
-                        <section className="flex-1 overflow-y-auto p-4 space-y-3">
-                            {messages.map((m) => (
-                                <div key={m.id} className="max-w-xl">
-                                    <div className="text-xs text-muted-foreground">
-                                        {new Date(m.createdAt).toLocaleString()}
+                        <section className="flex-1 overflow-y-auto p-4 space-y-2">
+                            {messages.map((m) => {
+                                const isMe = m?.sender?.id === user?.id || m?.sender?.id === "me";
+                                return (
+                                    <div
+                                        key={m.id}
+                                        className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}
+                                    >
+                                        <div
+                                            className={cn(
+                                                "max-w-[75%] rounded-2xl px-3 py-2 border whitespace-pre-wrap break-words",
+                                                isMe
+                                                    ? "bg-blue-100 border-blue-200 text-blue-900 rounded-br-none"
+                                                    : "bg-gray-100 border-gray-200 text-gray-900 rounded-bl-none"
+                                            )}
+                                        >
+                                            <div className="text-[10px] opacity-60 mb-1">
+                                                {new Date(m.createdAt).toLocaleTimeString([], {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                            </div>
+                                            <div>{m.content}</div>
+                                        </div>
                                     </div>
-                                    <div className="p-2 rounded bg-secondary whitespace-pre-wrap break-words">
-                                        {m.content}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </section>
                         <footer className="p-3 border-t flex gap-2 mb-5">
                             <input

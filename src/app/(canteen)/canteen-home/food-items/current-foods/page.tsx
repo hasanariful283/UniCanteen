@@ -41,7 +41,7 @@ const FoodItems = () => {
           </div>
           <h3 className="text-lg font-semibold">{food.name}</h3>
           <p className="text-sm text-gray-600 line-clamp-2">{food.description}</p>
-          <p className="mt-2 font-bold text-green-600">${food.price}</p>
+          <p className="mt-2 font-bold text-green-600"><span className="text-3xl">৳</span>{food.price}</p>
           <p className="text-sm text-yellow-500">⭐ {food.rating}</p>
           <p
             className={`mt-1 text-sm ${

@@ -398,6 +398,12 @@ export const CanSideItems = () => {
                     href: "/canteen-home/reports",
                     icon: <Receipt size={20} />,
                     active: isNavItemActive(pathname, "/canteen-home/reports"),
+                },
+                {
+                    name: "Messages",
+                    href: "/canteen-home/messages",
+                    icon: <MessageCircle size={20} />,
+                    active: isNavItemActive(pathname, "/canteen-home/messages"),
                 }
             ]
         },

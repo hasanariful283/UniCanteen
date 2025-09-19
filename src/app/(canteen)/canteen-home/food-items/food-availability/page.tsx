@@ -3,23 +3,6 @@ import { changeFoodAvailability } from "@/actions/canteen/canteen.action";
 import { Button } from "@/components/ui/button";
 import { CanteenFood } from "@/types/food";
 import React, { useEffect, useRef, useState } from "react";
-
-// const FOOD_CATEGORIES = [
-//     "POPULAR",
-//     "BREAKFAST",
-//     "LUNCH",
-//     "DINNER",
-//     "FAST_FOOD",
-//     "DESSERT",
-//     "BEVERAGE",
-//     "SNACK",
-//     "RICE_ITEMS",
-//     "DRINKS",
-//     "PACKET_ITEMS",
-//     "OTHERS",
-//     "MEAT_ITEMS",
-// ];
-
 import { FoodCategory } from "@prisma/client";
 const FOOD_CATEGORIES: FoodCategory[] = [
     "POPULAR",
@@ -72,7 +55,7 @@ const FoodAvailabilityPage = () => {
               );
 
     return (
-        <div className="p-6 max-w-3xl mx-auto">
+        <div className="p-6  mx-auto">
             <h1 className="text-3xl font-bold mb-8 text-center">
                 Food Availability
             </h1>
