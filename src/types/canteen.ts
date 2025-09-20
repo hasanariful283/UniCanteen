@@ -4,6 +4,27 @@ export enum CanteenName {
     KHANS_KITCHEN = "KHANS_KITCHEN"
 }
 
+export type FeaturedItem = {
+    id: string;
+    bannerImage?: string;
+    food: {
+        name: string;
+        price: number;
+        description?: string;
+        image?: string;
+        shop?: string;
+    };
+};
+
+export type Canteen = {
+    name: string;
+    image: string;
+    location: string;
+    rating: string;
+    href: string;
+    isOpen: boolean;
+};
+
 export interface CanteenDetails {
     id: string;
     name: CanteenName;

@@ -21,9 +21,10 @@ const CusNavBar = () => {
                 <Image
                     src="/UniCanteen_L.png"
                     alt="UniCanteen Logo"
-                    className="object-cover h-20"
+                    className="object-cover "
                     width={300}
                     height={5}
+                    priority
                 />
             </Link>
 

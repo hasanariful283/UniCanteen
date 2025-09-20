@@ -44,7 +44,7 @@ export default function OngoingOrders() {
             if (!res.ok || !data.conversation?.id) {
                 throw new Error(data.error || "Failed to start chat");
             }
-            // Navigate to messages page with selected conversation
+            // start chat
             window.location.href = `/customer-home/messages?c=${data.conversation.id}`;
         } catch (e) {
             console.error(e);
