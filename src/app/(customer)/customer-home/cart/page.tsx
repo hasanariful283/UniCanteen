@@ -115,8 +115,8 @@ export default function CartPage() {
                                 key={item.id}
                                 className="flex gap-4 bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition relative"
                             >
-                                <div className="w-28 h-28 relative flex-shrink-0">
-                                    <div className="relative w-32 h-32">
+                                <div className="w-28 h-28 relative flex-shrink-0 mr-4 mb-4">
+                                    <div className="relative w-32 h-32 ">
                                         <div className="relative w-32 h-32">
                                             <Image
                                                 src={
@@ -141,7 +141,7 @@ export default function CartPage() {
                                                 {item.food?.name}
                                             </h2>
                                             {item.food?.canteen?.name && (
-                                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
                                                     {item.food.canteen.name.replace(
                                                         /_/g,
                                                         " "
@@ -197,7 +197,7 @@ export default function CartPage() {
                                                     ৳{item.food?.price} ×{" "}
                                                     {item.quantity}
                                                 </div>
-                                                <div className="text-green-600 font-bold text-lg">
+                                                <div className="text-orange-700 font-semibold text-lg">
                                                     ৳
                                                     {(item.food?.price || 0) *
                                                         item.quantity}
@@ -222,7 +222,8 @@ export default function CartPage() {
                         ))}
                     </div>
 
-                    {/* Summary */}
+
+                    {/* Order Summary */}
                     <div className="mt-6 lg:mt-0 lg:w-80 flex-shrink-0 bg-white rounded-xl shadow-md p-6 sticky top-6 h-fit">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">
                             Order Summary
@@ -238,12 +239,12 @@ export default function CartPage() {
                         <div className="border-t border-gray-200 my-3"></div>
                         <div className="flex justify-between text-lg font-bold">
                             <span>Total</span>
-                            <span className="text-green-600">৳{total}</span>
+                            <span className="text-orange-600">৳{total}</span>
                         </div>
                         <button
                             onClick={checkout}
                             disabled={updatingId === "checkout"}
-                            className="mt-6 w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-lg text-lg transition"
+                            className="mt-6 w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold py-3 rounded-lg text-lg transition"
                         >
                             {updatingId === "checkout"
                                 ? "Placing order..."

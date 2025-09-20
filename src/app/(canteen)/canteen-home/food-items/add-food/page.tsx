@@ -65,7 +65,7 @@ export default function AddFoodPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className=" mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Add New Food Item</h1>
 
       {error && (
@@ -84,7 +84,7 @@ export default function AddFoodPage() {
             id="name"
             name="name"
             required
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
             placeholder="Enter food name"
           />
         </div>
@@ -100,7 +100,7 @@ export default function AddFoodPage() {
             step="0.01"
             min="0"
             required
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
             placeholder="0.00"
           />
         </div>
@@ -113,7 +113,7 @@ export default function AddFoodPage() {
             id="description"
             name="description"
             rows={3}
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
             placeholder="Enter food description"
           ></textarea>
         </div>
@@ -126,7 +126,7 @@ export default function AddFoodPage() {
             type="url"
             id="image"
             name="image"
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
             placeholder="https://example.com/image.jpg"
           />
         </div>
@@ -142,7 +142,7 @@ export default function AddFoodPage() {
             min="0"
             defaultValue="10"
             required
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
           />
         </div>
 
@@ -155,7 +155,7 @@ export default function AddFoodPage() {
             name="category"
             multiple
             required
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
             style={{ height: "160px" }}
           >
             {FOOD_CATEGORIES.map((cat) => (
@@ -178,7 +178,7 @@ export default function AddFoodPage() {
                 name="availability"
                 value="true"
                 defaultChecked
-                className="form-radio h-4 w-4 text-blue-600"
+                className="form-radio h-4 w-4 text-orange-600"
               />
               <span className="ml-2">Available</span>
             </label>
@@ -187,7 +187,7 @@ export default function AddFoodPage() {
                 type="radio"
                 name="availability"
                 value="false"
-                className="form-radio h-4 w-4 text-blue-600"
+                className="form-radio h-4 w-4 text-orange-600"
               />
               <span className="ml-2">Not Available</span>
             </label>
@@ -197,7 +197,7 @@ export default function AddFoodPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-blue-300 transition-colors"
+          className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 disabled:bg-orange-300 transition-colors"
         >
           {loading ? "Adding..." : "Add Food Item"}
         </button>

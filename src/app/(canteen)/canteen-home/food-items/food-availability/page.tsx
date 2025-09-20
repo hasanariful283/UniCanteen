@@ -67,7 +67,7 @@ const FoodAvailabilityPage = () => {
                     id="category-filter"
                     value={filter}
                     onChange={(e) => setFilter(e.target.value as FilterType)}
-                    className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500"
                 >
                     <option value="ALL">All</option>
                     {FOOD_CATEGORIES.map((cat) => (
@@ -126,7 +126,7 @@ const FoodAvailabilityPage = () => {
                                     food.category.map((cat) => (
                                         <span
                                             key={cat}
-                                            className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium"
+                                            className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium"
                                         >
                                             {cat.replace(/_/g, " ")}
                                         </span>
@@ -138,7 +138,7 @@ const FoodAvailabilityPage = () => {
                             </div>
                             <Button
                                 type="submit"
-                                className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition"
+                                className="mt-2 w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 rounded-lg transition"
                             >
                                 Toggle Availability
                             </Button>

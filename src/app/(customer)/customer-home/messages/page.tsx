@@ -218,7 +218,7 @@ function MessagesPageInner() {
                                             className={cn(
                                                 "max-w-[75%] rounded-2xl px-3 py-2 border whitespace-pre-wrap break-words",
                                                 isMe
-                                                    ? "bg-blue-100 border-blue-200 text-blue-900 rounded-br-none"
+                                                    ? "bg-orange-100 border-orange-200 text-orange-900 rounded-br-none"
                                                     : "bg-gray-100 border-gray-200 text-gray-900 rounded-bl-none"
                                             )}
                                         >

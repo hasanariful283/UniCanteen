@@ -94,7 +94,7 @@ const Home = () => {
             <div className="container mx-auto px-4 py-8">
 
                 {/* Hero Section */}
-                <div className="text-center mb-12">
+                <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                         Welcome to UniCanteen
                     </h1>
@@ -104,7 +104,7 @@ const Home = () => {
                 </div>
 
                 {/* Featured Items Carousel */}
-                <div className="mb-12">
+                <div className="mb-8">
                     <h2 className="text-2xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white">
                         Featured Items
                     </h2>
@@ -119,7 +119,7 @@ const Home = () => {
                                         key={item.id}
                                         className="flex-[0_0_100%] min-w-0"
                                     >
-                                        <div className="relative h-[400px] rounded-xl overflow-hidden">
+                                        <div className="relative h-[425px] rounded-xl overflow-hidden">
                                             <Image
                                                 src={
                                                     item.bannerImage ||
@@ -168,7 +168,7 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Canteens Grid */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {canteens.map((canteen) => (
                         <Link
@@ -177,7 +177,7 @@ const Home = () => {
                             className="block group"
                         >
                             <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-200 hover:scale-105">
-                                <div className="relative h-48 w-full">
+                                <div className="relative h-64 w-full">
                                     <Image
                                         src={canteen.image}
                                         alt={canteen.name}
