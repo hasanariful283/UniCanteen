@@ -68,7 +68,7 @@ const Home = () => {
             image: "https://i.ibb.co.com/N29Lm2CS/olympia.png",
             location: "North Campus",
             rating: "4.5",
-            href: "/customer-home/olympia-cafe",
+            href: "/olympia-cafe",
             isOpen: true,
         },
         {
@@ -76,7 +76,7 @@ const Home = () => {
             image: "https://i.ibb.co.com/00kZFSW/khans.png",
             location: "South Campus",
             rating: "4.3",
-            href: "/customer-home/khans-kitchen",
+            href: "/khans-kitchen",
             isOpen: true,
         },
         {
@@ -84,7 +84,7 @@ const Home = () => {
             image: "https://i.ibb.co.com/zhHLwb0x/neptune.png",
             location: "East Campus",
             rating: "4.4",
-            href: "/customer-home/neptune-cafe",
+            href: "/neptune-cafe",
             isOpen: false,
         },
     ];
