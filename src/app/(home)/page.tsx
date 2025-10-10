@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 
 import { Canteen, FeaturedItem } from "@/types/canteen";
 
-
 const Home = () => {
     const router = useRouter();
 
@@ -92,7 +91,6 @@ const Home = () => {
     return (
         <div className="flex-1 h-full overflow-y-auto">
             <div className="container mx-auto px-4 py-8">
-
                 {/* Hero Section */}
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -168,7 +166,6 @@ const Home = () => {
                     </div>
                 </div>
 
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {canteens.map((canteen) => (
                         <Link
@@ -186,7 +183,7 @@ const Home = () => {
                                         priority
                                         sizes="(max-width: 768px) 100vw,(max-width: 1200px) 50vw,33vw"
                                     />
-                                    {/* Status Badge */}
+                                    
                                     <div className="absolute top-4 right-4">
                                         <span
                                             className={`px-3 py-1 rounded-full text-sm font-medium ${

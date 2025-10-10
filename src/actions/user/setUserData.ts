@@ -21,6 +21,29 @@ export async function setUserDataToDB(userData: UserData) {
 
         if (existingUser) {
             console.log(`User with ID ${userId} already exists.`);
+            
+            // Check if user is delivery person and needs DeliveryPerson record
+            if (role === "DELIVERY_PERSON" || existingUser.userRole === "DELIVERY_PERSON") {
+                try {
+                    const existingDeliveryPerson = await prisma.deliveryPerson.findUnique({
+                        where: { userId },
+                    });
+
+                    if (!existingDeliveryPerson) {
+                        // Create DeliveryPerson record for existing user
+                        await prisma.deliveryPerson.create({
+                            data: {
+                                userId,
+                                uiuId: studentId || existingUser.studentId || `DEL-${userId.slice(-8)}`,
+                            },
+                        });
+                        console.log(`DeliveryPerson record created for existing user ${userId}`);
+                    }
+                } catch (error) {
+                    console.error("Error creating DeliveryPerson record for existing user:", error);
+                }
+            }
+            
             return existingUser;
         }
 
@@ -35,6 +58,30 @@ export async function setUserDataToDB(userData: UserData) {
                 studentId: studentId || null,
             },
         });
+
+        // If user is a delivery person, also create DeliveryPerson record
+        if (role === "DELIVERY_PERSON") {
+            try {
+                // Check if DeliveryPerson already exists
+                const existingDeliveryPerson = await prisma.deliveryPerson.findUnique({
+                    where: { userId },
+                });
+
+                if (!existingDeliveryPerson) {
+                    // Create DeliveryPerson record
+                    await prisma.deliveryPerson.create({
+                        data: {
+                            userId,
+                            uiuId: studentId || `DEL-${userId.slice(-8)}`, // Use studentId or generate from userId
+                        },
+                    });
+                    console.log(`DeliveryPerson record created for user ${userId}`);
+                }
+            } catch (error) {
+                console.error("Error creating DeliveryPerson record:", error);
+                // Don't throw error here to avoid breaking user creation
+            }
+        }
 
         console.log(`User with ID ${userId} created successfully.`);
         return newUser;

@@ -24,6 +24,10 @@ model User {
   // Messaging relations
   conversationParticipants ConversationParticipant[]
   messages                 Message[]
+
+  // Notification relations
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent     Notification[] @relation("NotificationSender")
 }
 
 enum RoleType {
@@ -92,15 +96,6 @@ model CanteenFood {
   OrderFoodItem OrderFoodItem[]
 }
 
-// model CanteenReviews {
-//   canteenId String   @id
-//   rating    Int
-//   comment   String?
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   canteen Canteen @relation(fields: [canteenId], references: [id])
-// }
 
 model CanteenReviews {
   id        String   @id @default(cuid())
@@ -204,6 +199,34 @@ model DeliveryProfile {
   rating      Float? // avg rating from deliveries
   completed   Int     @default(0)
   cancelled   Int     @default(0)
+  
+  // Profile settings
+  phone       String?
+  address     String?
+  vehicleType String? // "bike", "bicycle", "car", etc.
+  
+  // Notification preferences
+  orderNotifications    Boolean @default(true)
+  messageNotifications  Boolean @default(true)
+  earningsNotifications Boolean @default(false)
+  promotionNotifications Boolean @default(false)
+  soundEnabled         Boolean @default(true)
+  
+  // Privacy settings
+  showPhoneToCustomers    Boolean @default(true)
+  showLocationWhenOnline  Boolean @default(true)
+  allowCustomerRatings    Boolean @default(true)
+  
+  // App preferences
+  language String @default("en")
+  theme    String @default("light") // "light", "dark", "auto"
+  
+  // Default working hours (used for time slots)
+  defaultStartTime String @default("09:00") // Format: "HH:mm"
+  defaultEndTime   String @default("22:00") // Format: "HH:mm"
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   deliveryPerson DeliveryPerson @relation(fields: [userId], references: [userId])
   timeSlots DeliveryTimeSlot[]
@@ -213,8 +236,12 @@ model DeliveryTimeSlot {
   id         String   @id @default(cuid())
   deliveryId String
   dayOfWeek  WeekDay
-  startTime  DateTime
-  endTime    DateTime
+  startTime  String   // Format: "HH:mm" (e.g., "09:00")
+  endTime    String   // Format: "HH:mm" (e.g., "22:00")
+  isActive   Boolean  @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   delivery DeliveryProfile @relation(fields: [deliveryId], references: [id])
 }
@@ -235,6 +262,9 @@ model Order {
 
   // Messaging relation (one order may have one or more conversations)
   conversations Conversation[]
+  
+  // Notification relation
+  notifications Notification[]
 }
 
 model OrderFoodItem {
@@ -310,3 +340,47 @@ model Voucher {
   // Relations
   customer Customer @relation(fields: [customerId], references: [userId])
 }
+
+// --------------------------Notifications--------------------------
+
+enum NotificationType {
+  ORDER_ASSIGNED       // When an order is assigned to delivery person
+  ORDER_CANCELLED      // When an order is cancelled
+  ORDER_READY          // When canteen marks order as ready for pickup
+  ORDER_UPDATE         // When order status is updated
+  URGENT_MESSAGE       // When someone sends urgent message
+  SYSTEM_ALERT         // System-wide alerts
+  PAYMENT_UPDATE       // Payment related notifications
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String          // User who receives the notification
+  senderId    String?         // User who triggered the notification (optional for system notifications)
+  type        NotificationType
+  title       String
+  content     String
+  isRead      Boolean         @default(false)
+  orderId     String?         // Related order if applicable
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id])
+  sender    User? @relation("NotificationSender", fields: [senderId], references: [id])
+  order     Order? @relation(fields: [orderId], references: [id])
+
+  @@index([recipientId, isRead])
+  @@index([createdAt])
+}
+
+
+
+
+
+
+
+
+
+
+

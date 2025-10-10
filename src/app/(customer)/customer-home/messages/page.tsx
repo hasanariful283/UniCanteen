@@ -22,7 +22,11 @@ type Message = { id: string; content: string; createdAt: string; sender: User };
 
 export default function MessagesPage() {
     return (
-        <Suspense fallback={<div className="p-6 text-gray-600">Loading messages…</div>}>
+        <Suspense
+            fallback={
+                <div className="p-6 text-gray-600">Loading messages…</div>
+            }
+        >
             <MessagesPageInner />
         </Suspense>
     );
@@ -208,11 +212,18 @@ function MessagesPageInner() {
                         </header>
                         <section className="flex-1 overflow-y-auto p-4 space-y-2">
                             {messages.map((m) => {
-                                const isMe = m?.sender?.id === user?.id || m?.sender?.id === "me";
+                                const isMe =
+                                    m?.sender?.id === user?.id ||
+                                    m?.sender?.id === "me";
                                 return (
                                     <div
                                         key={m.id}
-                                        className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}
+                                        className={cn(
+                                            "flex w-full",
+                                            isMe
+                                                ? "justify-end"
+                                                : "justify-start"
+                                        )}
                                     >
                                         <div
                                             className={cn(
@@ -223,7 +234,9 @@ function MessagesPageInner() {
                                             )}
                                         >
                                             <div className="text-[10px] opacity-60 mb-1">
-                                                {new Date(m.createdAt).toLocaleTimeString([], {
+                                                {new Date(
+                                                    m.createdAt
+                                                ).toLocaleTimeString([], {
                                                     hour: "2-digit",
                                                     minute: "2-digit",
                                                 })}
