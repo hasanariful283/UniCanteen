@@ -55,6 +55,7 @@ model Canteen {
   owner       User             @relation(fields: [ownerId], references: [id])
   reviews     CanteenReviews[]
   CanteenFood CanteenFood[]
+  reports     CustomerReport[]
 
   // orders Order[]
   OrderFoodItem OrderFoodItem[]
@@ -123,6 +124,7 @@ model Customer {
   cart         Cart?
   canteenReviews CanteenReviews[]
   vouchers     Voucher[]
+  reports      CustomerReport[]
 }
 
 model FeaturedItems {
@@ -174,6 +176,7 @@ enum OrderStatus {
   PENDING
   ACCEPTED
   IN_PROGRESS
+  DELIVERING
   DELIVERED
   CANCELLED
 }
@@ -190,6 +193,9 @@ model DeliveryPerson {
 
   // relations with Order
   deliveries Order[] @relation("OrderDeliveryMan") // user as delivery person
+  
+  // Reports filed against this delivery person
+  reports CustomerReport[]
 }
 
 model DeliveryProfile {
@@ -265,6 +271,9 @@ model Order {
   
   // Notification relation
   notifications Notification[]
+  
+  // Reports relation
+  reports       CustomerReport[]
 }
 
 model OrderFoodItem {
@@ -279,6 +288,7 @@ model OrderFoodItem {
   order    Order         @relation(fields: [orderId], references: [id])
   food     CanteenFood   @relation(fields: [foodId], references: [id])
   canteen  Canteen       @relation(fields: [canteenId], references: [id])
+  reports  CustomerReport[]
 }
 
 // --------------------------Messaging--------------------------
@@ -351,6 +361,7 @@ enum NotificationType {
   URGENT_MESSAGE       // When someone sends urgent message
   SYSTEM_ALERT         // System-wide alerts
   PAYMENT_UPDATE       // Payment related notifications
+  REPORT_SUBMITTED     // When a customer submits a report
 }
 
 model Notification {
@@ -374,13 +385,60 @@ model Notification {
   @@index([createdAt])
 }
 
+model CustomerReport {
+  id          String   @id @default(cuid())
+  type        ReportType
+  title       String
+  description String?
+  status      ReportStatus @default(PENDING)
+  priority    ReportPriority @default(MEDIUM)
+  rating      Int?     // 1-5 star rating
+  response    String?  // Canteen's response to the report
+  
+  // Relations
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [userId])
+  
+  canteenId   String
+  canteen     Canteen  @relation(fields: [canteenId], references: [id])
+  
+  orderId     String?
+  order       Order?   @relation(fields: [orderId], references: [id])
+  
+  foodItemId  String?
+  foodItem    OrderFoodItem? @relation(fields: [foodItemId], references: [id])
+  
+  deliveryPersonId String?
+  deliveryPerson   DeliveryPerson? @relation(fields: [deliveryPersonId], references: [userId])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  @@map("customer_reports")
+}
 
+enum ReportType {
+  FOOD_QUALITY
+  SERVICE
+  HYGIENE
+  DELIVERY
+  PRICING
+  OTHER
+}
 
+enum ReportStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
 
-
-
-
+enum ReportPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
 
 
 

@@ -128,7 +128,7 @@ const NeptuneCafe = () => {
               </div>
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">{food.name}</h2>
-                <span className="font-bold text-blue-500 text-lg">{food.price} tk</span>
+                <span className="font-bold text-blue-500 text-lg">৳{food.price}</span>
               </div>
               <p className="text-gray-600 text-sm">{food.description}</p>
               <div className="flex flex-wrap gap-2 my-1">

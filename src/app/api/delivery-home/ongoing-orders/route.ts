@@ -20,7 +20,7 @@ export async function GET() {
     const ongoingOrders = await prisma.order.findMany({
       where: {
         assignedTo: userId,
-        status: { in: ["ACCEPTED", "IN_PROGRESS"] },
+        status: { in: ["ACCEPTED", "IN_PROGRESS", "DELIVERING"] },
       },
       orderBy: { updatedAt: "desc" },
       take: 10, // Limit to recent 10

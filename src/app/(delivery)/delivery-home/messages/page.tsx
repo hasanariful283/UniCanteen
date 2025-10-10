@@ -15,7 +15,14 @@ import {
 
 type Conversation = {
     id: string;
-    participantNames: string[];
+    participantNames?: string[];
+    participants?: Array<{
+        userId: string;
+        user: {
+            name: string;
+            email: string;
+        };
+    }>;
     lastMessage?: {
         content: string;
         timestamp: string;
@@ -40,16 +47,32 @@ type Message = {
 const DeliveryMessagesPageInner = () => {
     const { user } = useUser();
     const searchParams = useSearchParams();
-    const conversationId = searchParams?.get('conversation');
-
+    const conversationId = searchParams.get('c');
+    
     const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
+    const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
 
-    useEffect(() => {
+    // Helper function to get participant names from conversation data
+    const getParticipantNames = (conversation: Conversation): string => {
+        // If participantNames exists, use it
+        if (conversation.participantNames && conversation.participantNames.length > 0) {
+            return conversation.participantNames.join(', ');
+        }
+        
+        // Otherwise, extract names from participants array
+        if (conversation.participants && conversation.participants.length > 0) {
+            return conversation.participants
+                .map(p => p.user.name || p.user.email)
+                .filter(name => name) // Filter out any null/undefined names
+                .join(', ');
+        }
+        
+        return 'Unknown Participants';
+    };    useEffect(() => {
         if (!user) return;
         fetchConversations();
     }, [user]);
@@ -161,7 +184,7 @@ const DeliveryMessagesPageInner = () => {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-start mb-1">
                                             <p className="font-medium text-gray-900 truncate">
-                                                {conversation.participantNames.join(', ')}
+                                                {getParticipantNames(conversation)}
                                             </p>
                                             {conversation.unreadCount > 0 && (
                                                 <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 ml-2">
@@ -213,7 +236,7 @@ const DeliveryMessagesPageInner = () => {
                                 </div>
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        {selectedConversation.participantNames.join(', ')}
+                                        {getParticipantNames(selectedConversation)}
                                     </p>
                                     {selectedConversation.order && (
                                         <p className="text-sm text-gray-600">
@@ -289,7 +312,7 @@ const DeliveryMessagesPageInner = () => {
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center bg-gray-50">
+                    <div className="pt-50 flex-1 flex items-center justify-center bg-gray-50 ">
                         <div className="text-center">
                             <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a conversation</h3>

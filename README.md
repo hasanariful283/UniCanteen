@@ -1,3 +1,3 @@
 # Parvez Hossain
 
-npm install embla-carousel-react
+npm install embla-carousel-react recharts @types/recharts

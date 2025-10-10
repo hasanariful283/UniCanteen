@@ -15,7 +15,7 @@ export async function GET() {
     // Orders that include items from these canteens and are active
     const orders = await prisma.order.findMany({
       where: {
-        status: { in: ["PENDING", "ACCEPTED", "IN_PROGRESS"] },
+        status: { in: ["PENDING", "ACCEPTED", "IN_PROGRESS", "DELIVERING"] },
         foodItems: { some: { canteenId: { in: canteenIds } } },
       },
       orderBy: { createdAt: "desc" },

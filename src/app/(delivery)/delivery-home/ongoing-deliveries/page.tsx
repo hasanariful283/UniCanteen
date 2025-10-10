@@ -49,7 +49,15 @@ const OngoingDeliveriesPage = () => {
         try {
             setLoading(true);
             const response = await fetch('/api/delivery-home/ongoing-orders');
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Failed to fetch ongoing orders:', response.status, errorData);
+                return;
+            }
+            
             const data = await response.json();
+            console.log('Fetched ongoing orders:', data);
             setOngoingOrders(data.orders || []);
         } catch (error) {
             console.error('Error fetching ongoing orders:', error);
@@ -61,19 +69,32 @@ const OngoingDeliveriesPage = () => {
     const updateOrderStatus = async (orderId: string, newStatus: string) => {
         try {
             setUpdatingOrder(orderId);
-            const response = await fetch('/api/delivery-home/ongoing-orders', {
+            
+            // Use different API endpoints based on status
+            let apiUrl = '/api/delivery-home/ongoing-orders';
+            if (newStatus === 'DELIVERED') {
+                // Use the delivering-orders endpoint for marking as delivered
+                apiUrl = '/api/delivery-home/delivering-orders';
+            }
+            
+            const response = await fetch(apiUrl, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ orderId, status: newStatus }),
             });
 
             if (response.ok) {
+                const result = await response.json();
+                console.log('Order status updated:', result);
                 await fetchOngoingOrders(); // Refresh the list
             } else {
-                console.error('Failed to update order status');
+                const errorData = await response.json();
+                console.error('Failed to update order status:', response.status, errorData);
+                alert(`Failed to update order status: ${errorData.error || 'Unknown error'}`);
             }
         } catch (error) {
             console.error('Error updating order status:', error);
+            alert('Network error while updating order status');
         } finally {
             setUpdatingOrder(null);
         }
@@ -85,7 +106,7 @@ const OngoingDeliveriesPage = () => {
                 return 'bg-blue-100 text-blue-800 border-blue-200';
             case 'IN_PROGRESS':
                 return 'bg-orange-100 text-orange-800 border-orange-200';
-            case 'OUT_FOR_DELIVERY':
+            case 'DELIVERING':
                 return 'bg-purple-100 text-purple-800 border-purple-200';
             default:
                 return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -95,10 +116,10 @@ const OngoingDeliveriesPage = () => {
     const getNextAction = (status: string) => {
         switch (status) {
             case 'ACCEPTED':
-                return { text: 'Start Delivery', nextStatus: 'IN_PROGRESS', icon: Truck };
+                return { text: 'Start Preparing', nextStatus: 'IN_PROGRESS', icon: Truck };
             case 'IN_PROGRESS':
-                return { text: 'Out for Delivery', nextStatus: 'OUT_FOR_DELIVERY', icon: Navigation };
-            case 'OUT_FOR_DELIVERY':
+                return { text: 'Out for Delivery', nextStatus: 'DELIVERING', icon: Navigation };
+            case 'DELIVERING':
                 return { text: 'Mark Delivered', nextStatus: 'DELIVERED', icon: CheckCircle };
             default:
                 return null;
@@ -115,9 +136,39 @@ const OngoingDeliveriesPage = () => {
 
     return (
         <div className="p-4 mx-auto">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Ongoing Deliveries</h1>
-                <p className="text-gray-600">Manage your active delivery orders</p>
+            <div className="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Ongoing Deliveries</h1>
+                    <p className="text-gray-600">Manage your active delivery orders</p>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={async () => {
+                            try {
+                                const response = await fetch('/api/delivery-home/assign-orders', { method: 'POST' });
+                                if (response.ok) {
+                                    const result = await response.json();
+                                    alert(`Assigned ${result.orders?.length || 0} orders for testing`);
+                                    await fetchOngoingOrders();
+                                } else {
+                                    const error = await response.json();
+                                    alert(`Failed to assign orders: ${error.error}`);
+                                }
+                            } catch (error) {
+                                console.error('Error assigning orders:', error);
+                            }
+                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Get Test Orders
+                    </button>
+                    <button
+                        onClick={fetchOngoingOrders}
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                        Refresh
+                    </button>
+                </div>
             </div>
 
             {ongoingOrders.length === 0 ? (
@@ -150,7 +201,9 @@ const OngoingDeliveriesPage = () => {
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
-                                        {order.status.replace('_', ' ')}
+                                        {order.status === 'IN_PROGRESS' ? 'Preparing' : 
+                                         order.status === 'DELIVERING' ? 'Out for Delivery' :
+                                         order.status.replace('_', ' ')}
                                     </span>
                                 </div>
 
@@ -216,7 +269,14 @@ const OngoingDeliveriesPage = () => {
                                 <div className="flex gap-3 pt-4 border-t">
                                     {nextAction && (
                                         <button
-                                            onClick={() => updateOrderStatus(order.id, nextAction.nextStatus)}
+                                            onClick={() => {
+                                                console.log('Action clicked:', {
+                                                    orderId: order.id,
+                                                    currentStatus: order.status,
+                                                    nextStatus: nextAction.nextStatus
+                                                });
+                                                updateOrderStatus(order.id, nextAction.nextStatus);
+                                            }}
                                             disabled={updatingOrder === order.id}
                                             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-50"
                                         >

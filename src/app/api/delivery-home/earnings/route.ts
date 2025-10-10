@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
     // Calculate earnings based on delivery fee structure
     const calculateEarnings = (totalPrice: number) => {
-      // Assume delivery person gets 15% of order value + base fee of 20 taka
+      // Assume delivery person gets 15% of order value + base fee of ৳20
       const baseFee = 20;
       const commission = totalPrice * 0.15;
       return baseFee + commission;

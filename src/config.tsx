@@ -346,12 +346,12 @@ export const CanSideItems = () => {
         {
             section: "Orders",
             items: [
-                {
-                    name: "All Orders",
-                    href: "/canteen-home/orders",
-                    icon: <ScrollText size={20} />,
-                    active: isNavItemActive(pathname, "/canteen-home/orders"),
-                },
+                // {
+                //     name: "All Orders",
+                //     href: "/canteen-home/orders",
+                //     icon: <ScrollText size={20} />,
+                //     active: isNavItemActive(pathname, "/canteen-home/orders"),
+                // },
                 {
                     name: "Pending Orders",
                     href: "/canteen-home/orders/pending",
@@ -366,24 +366,24 @@ export const CanSideItems = () => {
                 },
             ],
         },
-        {
-            section: "Staff Management",
-            items: [
-                {
-                    name: "Staffs List",
-                    href: "/canteen-home/staffs",
-                    icon: <Users size={20} />,
-                    active: isNavItemActive(pathname, "/canteen-home/staffs"),
-                },
-                {
-                    name: "Add Staff",
-                    href: "/canteen-home/staffs/add-staffs",
-                    icon: <UserPlus size={20} />,
-                    active: isNavItemActive(pathname, "/canteen-home/staffs/add-staffs"),
-                }
-            ]
+        // {
+        //     section: "Staff Management",
+        //     items: [
+        //         {
+        //             name: "Staffs List",
+        //             href: "/canteen-home/staffs",
+        //             icon: <Users size={20} />,
+        //             active: isNavItemActive(pathname, "/canteen-home/staffs"),
+        //         },
+        //         {
+        //             name: "Add Staff",
+        //             href: "/canteen-home/staffs/add-staffs",
+        //             icon: <UserPlus size={20} />,
+        //             active: isNavItemActive(pathname, "/canteen-home/staffs/add-staffs"),
+        //         }
+        //     ]
 
-        },
+        // },
         {
             section: "Others",
             items: [

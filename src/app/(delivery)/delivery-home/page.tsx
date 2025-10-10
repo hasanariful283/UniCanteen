@@ -231,9 +231,9 @@ const DeliveryHome = () => {
     }
 
     return (
-        <div className="p-4">
+        <div className="pt-10">
             {/* Header with Clock and Availability Toggle */}
-            <div className="bg-white rounded-lg p-6 shadow-sm mx-20 mb-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm mx-10 mb-6">
                 <div className="flex items-center justify-between">
                     {/* Real-time Clock */}
                     <div className="flex items-center gap-4">
@@ -292,7 +292,7 @@ const DeliveryHome = () => {
             </div>
 
             {/* Stats Dashboard */}
-            <div className="flex justify-between p-4 bg-white rounded-sm mx-20">
+            <div className="flex justify-between p-4 bg-white rounded-sm mx-10">
                 <div className="flex items-center gap-2 shadow-lg p-4">
                     <ArrowUpDown className="border rounded-full border-orange-500 text-orange-500 h-16 w-16 p-2" />
                     <div>
@@ -325,7 +325,7 @@ const DeliveryHome = () => {
             </div>
 
             {/* Orders Dashboard */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 mx-20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 mx-10">
                 {/* Recent Ongoing Orders */}
                 <div className="bg-white rounded-lg p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
@@ -436,7 +436,7 @@ const DeliveryHome = () => {
             </div>
 
             {/* Notifications & Alerts */}
-            <div className="bg-white rounded-lg p-6 shadow-sm mt-6 mx-20">
+            <div className="bg-white rounded-lg p-6 shadow-sm mt-6 mx-10">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <div className="relative">

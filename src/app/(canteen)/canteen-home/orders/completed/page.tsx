@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { Truck, MessageSquare, Clock, User, CheckCircle } from "lucide-react";
 
 type OrderItem = {
   id: string;
@@ -17,6 +18,19 @@ type Order = {
   foodItems: OrderItem[];
   customer?: { user?: { name?: string | null } } | null;
   deliveryMan?: { user?: { name?: string | null } } | null;
+  assignedTo?: string | null;
+};
+
+type DeliveryPerson = {
+  userId: string;
+  user: {
+    name: string | null;
+    phone: string | null;
+  };
+  DeliveryProfile: {
+    isAvailable: boolean;
+    rating: number | null;
+  } | null;
 };
 
 const statusStyles: Record<Order["status"], string> = {
@@ -31,23 +45,106 @@ export default function CompletedOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deliveryPersons, setDeliveryPersons] = useState<DeliveryPerson[]>([]);
+  const [assigningOrder, setAssigningOrder] = useState<string | null>(null);
+  const [selectedDeliveryPerson, setSelectedDeliveryPerson] = useState<string>("");
+  const [showAssignModal, setShowAssignModal] = useState<string | null>(null);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch("/api/canteen-home/orders/completed", { cache: "no-store" });
+      if (!res.ok) throw new Error((await res.json()).error || "Failed to load orders");
+      const data = await res.json();
+      setOrders(data.orders || []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDeliveryPersons = async () => {
+    try {
+      const res = await fetch("/api/canteen-home/delivery-persons?status=available", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setDeliveryPersons(data.deliveryPersons || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch delivery persons:", e);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/canteen-home/orders/completed", { cache: "no-store" });
-        if (!res.ok) throw new Error((await res.json()).error || "Failed to load orders");
-        const data = await res.json();
-        if (mounted) setOrders(data.orders || []);
-      } catch (e) {
-        if (mounted) setError(e instanceof Error ? e.message : "Failed to load orders");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
+    fetchOrders();
+    fetchDeliveryPersons();
   }, []);
+
+  const canAssignDelivery = (order: Order) => {
+    // Can assign delivery within 30 minutes and if not already assigned
+    const orderTime = new Date(order.createdAt).getTime();
+    const now = new Date().getTime();
+    const timeDiff = now - orderTime;
+    const thirtyMinutes = 30 * 60 * 1000;
+    
+    return timeDiff <= thirtyMinutes && !order.assignedTo && order.status === 'DELIVERED';
+  };
+
+  const assignDeliveryPerson = async (orderId: string, deliveryPersonId: string) => {
+    if (!deliveryPersonId) return;
+    
+    setAssigningOrder(orderId);
+    try {
+      const res = await fetch(`/api/canteen-home/orders/${orderId}/assign-delivery`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deliveryPersonId }),
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to assign delivery person");
+      }
+      
+      // Update local state
+      setOrders(prev => prev.map(order => 
+        order.id === orderId ? { ...order, assignedTo: deliveryPersonId } : order
+      ));
+      
+      // Start conversation with delivery person
+      await startConversationWithDelivery(orderId, deliveryPersonId);
+      
+      setShowAssignModal(null);
+      setSelectedDeliveryPerson("");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to assign delivery person");
+    } finally {
+      setAssigningOrder(null);
+    }
+  };
+
+  const startConversationWithDelivery = async (orderId: string, deliveryPersonId: string) => {
+    try {
+      const res = await fetch("/api/messages/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          participantIds: [deliveryPersonId], 
+          orderId 
+        }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.conversation) {
+          // Redirect to messages with the conversation
+          window.open(`/canteen-home/messages?c=${data.conversation.id}`, '_blank');
+        }
+      }
+    } catch (e) {
+      console.error("Failed to start conversation:", e);
+    }
+  };
 
   if (loading) return <div className="p-6 text-gray-600">Loading orders…</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
@@ -102,19 +199,108 @@ export default function CompletedOrders() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-              <div>
-                {order.deliveryMan?.user?.name ? `Delivery by ${order.deliveryMan.user.name}` : "Delivery person not assigned"}
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {order.deliveryMan?.user?.name ? (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span>Delivery by {order.deliveryMan.user.name}</span>
+                  </div>
+                ) : order.assignedTo ? (
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-blue-500" />
+                    <span>Delivery assigned</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-orange-500" />
+                    <span>Delivery person not assigned</span>
+                  </div>
+                )}
               </div>
-              {order.deliveryAt && (
-                <div>
-                  Delivered at: {new Date(order.deliveryAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </div>
-              )}
+              
+              <div className="flex items-center gap-3">
+                {order.deliveryAt && (
+                  <div className="text-sm text-gray-600">
+                    Delivered at: {new Date(order.deliveryAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                )}
+                
+                {canAssignDelivery(order) && (
+                  <button
+                    onClick={() => setShowAssignModal(order.id)}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg flex items-center gap-1 transition-colors"
+                  >
+                    <Truck className="w-4 h-4" />
+                    Assign Delivery
+                  </button>
+                )}
+                
+                {order.assignedTo && (
+                  <button
+                    onClick={() => startConversationWithDelivery(order.id, order.assignedTo!)}
+                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg flex items-center gap-1 transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Message Delivery
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         );
       })}
+      
+      {/* Delivery Assignment Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Assign Delivery Person</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Delivery Person
+              </label>
+              <select
+                value={selectedDeliveryPerson}
+                onChange={(e) => setSelectedDeliveryPerson(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Choose delivery person...</option>
+                {deliveryPersons
+                  .filter(dp => dp.DeliveryProfile?.isAvailable)
+                  .map((dp) => (
+                    <option key={dp.userId} value={dp.userId}>
+                      {dp.user.name || "Unknown"} 
+                      {dp.DeliveryProfile?.rating && ` (${dp.DeliveryProfile.rating.toFixed(1)}★)`}
+                      {dp.user.phone && ` - ${dp.user.phone}`}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowAssignModal(null);
+                  setSelectedDeliveryPerson("");
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                disabled={assigningOrder === showAssignModal}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => assignDeliveryPerson(showAssignModal, selectedDeliveryPerson)}
+                disabled={!selectedDeliveryPerson || assigningOrder === showAssignModal}
+                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+              >
+                {assigningOrder === showAssignModal ? "Assigning..." : "Assign & Message"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

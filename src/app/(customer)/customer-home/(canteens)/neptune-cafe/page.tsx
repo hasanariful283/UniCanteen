@@ -129,7 +129,7 @@ const NeptuneCafePage = () => {
                                     {food.name}
                                 </h2>
                                 <span className="font-bold text-blue-500 text-lg">
-                                    {food.price} tk
+                                    ৳{food.price}
                                 </span>
                             </div>
                             <p className="text-gray-600 text-sm">
