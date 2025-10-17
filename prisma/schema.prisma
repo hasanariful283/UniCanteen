@@ -8,26 +8,281 @@ datasource db {
 }
 
 model User {
-  id        String   @id
-  email     String?  @unique
-  name      String?
-  phone     String? // @unique
-  studentId String?
-  userRole  RoleType @default(CUSTOMER)
+  id                       String                    @id
+  email                    String?                   @unique
+  name                     String?
+  phone                    String?
+  studentId                String?
+  userRole                 RoleType                  @default(DEFAULT)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  canteens                 Canteen[]
+  conversationParticipants ConversationParticipant[]
+  Customer                 Customer?
+  DeliveryPerson           DeliveryPerson?
+  messages                 Message[]
+  notificationsReceived    Notification[]            @relation("NotificationRecipient")
+  notificationsSent        Notification[]            @relation("NotificationSender")
+}
+
+model Canteen {
+  id            String           @id
+  name          CanteenName
+  canteen_image String?
+  ownerId       String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  owner         User             @relation(fields: [ownerId], references: [id])
+  CanteenFood   CanteenFood[]
+  reviews       CanteenReviews[]
+  OrderFoodItem OrderFoodItem[]
+  reports       CustomerReport[]
+}
+
+model CanteenFood {
+  canteenId     String
+  name          String
+  price         Float
+  image         String?
+  rating        Float
+  description   String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  availability  Boolean         @default(true)
+  stocks        Int             @default(10)
+  category      FoodCategory[]
+  id            String          @id @default(cuid())
+  canteen       Canteen         @relation(fields: [canteenId], references: [id])
+  cartItems     CartItem[]
+  featuredItems FeaturedItems[]
+  OrderFoodItem OrderFoodItem[]
+}
+
+model CanteenReviews {
+  canteenId String
+  rating    Int
+  comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String
+  canteen   Canteen  @relation(fields: [canteenId], references: [id])
+  customer  Customer @relation(fields: [userId], references: [userId])
+}
 
-  canteens        Canteen[]
-  Customer        Customer?
-  DeliveryPerson   DeliveryPerson?
+model Customer {
+  userId         String           @id
+  uiuId          String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  canteenReviews CanteenReviews[]
+  cart           Cart?
+  user           User             @relation(fields: [userId], references: [id])
+  ordersPlaced   Order[]          @relation("CustomerOrders")
+  vouchers       Voucher[]
+  reports        CustomerReport[]
+}
 
-  // Messaging relations
-  conversationParticipants ConversationParticipant[]
-  messages                 Message[]
+model FeaturedItems {
+  id          String      @id @default(cuid())
+  bannerImage String?
+  isFeatured  Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  foodId      String
+  food        CanteenFood @relation(fields: [foodId], references: [id])
+}
 
-  // Notification relations
-  notificationsReceived Notification[] @relation("NotificationRecipient")
-  notificationsSent     Notification[] @relation("NotificationSender")
+model Cart {
+  id         String     @id @default(cuid())
+  customerId String     @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  customer   Customer   @relation(fields: [customerId], references: [userId])
+  items      CartItem[]
+}
+
+model CartItem {
+  id        String      @id @default(cuid())
+  cartId    String
+  foodId    String
+  quantity  Int         @default(1)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  cart      Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  food      CanteenFood @relation(fields: [foodId], references: [id])
+
+  @@unique([cartId, foodId])
+}
+
+model DeliveryPerson {
+  userId          String           @id
+  uiuId           String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id])
+  DeliveryProfile DeliveryProfile?
+  deliveries      Order[]          @relation("OrderDeliveryMan")
+  reports         CustomerReport[]
+}
+
+model DeliveryProfile {
+  id                     String             @id @default(cuid())
+  userId                 String             @unique
+  isAvailable            Boolean            @default(false)
+  rating                 Float?
+  completed              Int                @default(0)
+  cancelled              Int                @default(0)
+  address                String?
+  allowCustomerRatings   Boolean            @default(true)
+  createdAt              DateTime           @default(now())
+  defaultEndTime         String             @default("22:00")
+  defaultStartTime       String             @default("09:00")
+  earningsNotifications  Boolean            @default(false)
+  language               String             @default("en")
+  messageNotifications   Boolean            @default(true)
+  orderNotifications     Boolean            @default(true)
+  phone                  String?
+  promotionNotifications Boolean            @default(false)
+  showLocationWhenOnline Boolean            @default(true)
+  showPhoneToCustomers   Boolean            @default(true)
+  soundEnabled           Boolean            @default(true)
+  theme                  String             @default("light")
+  updatedAt              DateTime           @updatedAt
+  vehicleType            String?
+  deliveryPerson         DeliveryPerson     @relation(fields: [userId], references: [userId])
+  timeSlots              DeliveryTimeSlot[]
+}
+
+model DeliveryTimeSlot {
+  id         String          @id @default(cuid())
+  deliveryId String
+  dayOfWeek  WeekDay
+  startTime  String
+  endTime    String
+  createdAt  DateTime        @default(now())
+  isActive   Boolean         @default(true)
+  updatedAt  DateTime        @updatedAt
+  delivery   DeliveryProfile @relation(fields: [deliveryId], references: [id])
+}
+
+model Order {
+  id            String           @id @default(cuid())
+  customerId    String
+  status        OrderStatus      @default(PENDING)
+  totalPrice    Float
+  assignedTo    String?
+  deliveryAt    DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  conversations Conversation[]
+  notifications Notification[]
+  deliveryMan   DeliveryPerson?  @relation("OrderDeliveryMan", fields: [assignedTo], references: [userId])
+  customer      Customer         @relation("CustomerOrders", fields: [customerId], references: [userId])
+  foodItems     OrderFoodItem[]
+  reports       CustomerReport[]
+}
+
+model OrderFoodItem {
+  id        String           @id @default(cuid())
+  orderId   String
+  foodId    String
+  canteenId String
+  quantity  Int              @default(1)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  canteen   Canteen          @relation(fields: [canteenId], references: [id])
+  food      CanteenFood      @relation(fields: [foodId], references: [id])
+  order     Order            @relation(fields: [orderId], references: [id])
+  reports   CustomerReport[]
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  orderId      String?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  order        Order?                    @relation(fields: [orderId], references: [id])
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  type           MessageType  @default(TEXT)
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
+}
+
+model Voucher {
+  id         String   @id @default(cuid())
+  customerId String
+  discount   Float
+  usageLimit Int?
+  usedCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  customer   Customer @relation(fields: [customerId], references: [userId])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  senderId    String?
+  type        NotificationType
+  title       String
+  content     String
+  isRead      Boolean          @default(false)
+  orderId     String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  order       Order?           @relation(fields: [orderId], references: [id])
+  recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [id])
+  sender      User?            @relation("NotificationSender", fields: [senderId], references: [id])
+
+  @@index([recipientId, isRead])
+  @@index([createdAt])
+}
+
+model CustomerReport {
+  id               String          @id @default(cuid())
+  type             ReportType
+  title            String
+  description      String?
+  status           ReportStatus    @default(PENDING)
+  priority         ReportPriority  @default(MEDIUM)
+  rating           Int?
+  response         String?
+  customerId       String
+  canteenId        String
+  orderId          String?
+  foodItemId       String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deliveryPersonId String?
+  canteen          Canteen         @relation(fields: [canteenId], references: [id])
+  customer         Customer        @relation(fields: [customerId], references: [userId])
+  deliveryPerson   DeliveryPerson? @relation(fields: [deliveryPersonId], references: [userId])
+  foodItem         OrderFoodItem?  @relation(fields: [foodItemId], references: [id])
+  order            Order?          @relation(fields: [orderId], references: [id])
+
+  @@map("customer_reports")
 }
 
 enum RoleType {
@@ -42,23 +297,6 @@ enum CanteenName {
   Khans_Kitchen
   Olympia_Cafe
   Neptune_Cafe
-}
-
-model Canteen {
-  id            String      @id
-  name          CanteenName
-  canteen_image String?
-  ownerId       String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  owner       User             @relation(fields: [ownerId], references: [id])
-  reviews     CanteenReviews[]
-  CanteenFood CanteenFood[]
-  reports     CustomerReport[]
-
-  // orders Order[]
-  OrderFoodItem OrderFoodItem[]
 }
 
 enum FoodCategory {
@@ -77,91 +315,6 @@ enum FoodCategory {
   MEAT_ITEMS
 }
 
-model CanteenFood {
-  id           String   @id @default(cuid())
-  canteenId    String
-  name         String
-  price        Float
-  image        String?
-  rating       Float
-  description  String?
-  availability Boolean  @default(true)
-  stocks       Int      @default(10)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  category      FoodCategory[]
-  canteen       Canteen         @relation(fields: [canteenId], references: [id])
-  featuredItems FeaturedItems[]
-  cartItems     CartItem[]
-  OrderFoodItem OrderFoodItem[]
-}
-
-
-model CanteenReviews {
-  id        String   @id @default(cuid())
-  canteenId String
-  userId    String
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  canteen Canteen @relation(fields: [canteenId], references: [id])
-  customer    Customer    @relation(fields: [userId], references: [userId])
-
-  @@unique([canteenId, userId])
-}
-
-model Customer {
-  userId    String   @id
-  uiuId     String   // @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ordersPlaced Order[] @relation("CustomerOrders")
-  user         User    @relation(fields: [userId], references: [id])
-  cart         Cart?
-  canteenReviews CanteenReviews[]
-  vouchers     Voucher[]
-  reports      CustomerReport[]
-}
-
-model FeaturedItems {
-  id          String      @id @default(cuid())
-  bannerImage String?
-  isFeatured  Boolean     @default(false)
-  foodId      String
-  food        CanteenFood @relation(fields: [foodId], references: [id])
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-}
-
-// --------------------------Order And Cart--------------------------\
-
-model Cart {
-  id         String   @id @default(cuid())
-  customerId String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  customer Customer   @relation(fields: [customerId], references: [userId])
-  items    CartItem[]
-}
-
-model CartItem {
-  id        String   @id @default(cuid())
-  cartId    String
-  foodId    String
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  food CanteenFood @relation(fields: [foodId], references: [id])
-  @@unique([cartId, foodId])
-}
-
 enum WeekDay {
   MONDAY
   TUESDAY
@@ -176,122 +329,10 @@ enum OrderStatus {
   PENDING
   ACCEPTED
   IN_PROGRESS
-  DELIVERING
   DELIVERED
   CANCELLED
+  DELIVERING
 }
-
-
-model DeliveryPerson {
-  userId    String   @id
-  uiuId     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-  DeliveryProfile DeliveryProfile?
-
-  // relations with Order
-  deliveries Order[] @relation("OrderDeliveryMan") // user as delivery person
-  
-  // Reports filed against this delivery person
-  reports CustomerReport[]
-}
-
-model DeliveryProfile {
-  id          String  @id @default(cuid())
-  userId      String  @unique
-  isAvailable Boolean @default(false) // delivery ON/OFF button
-  rating      Float? // avg rating from deliveries
-  completed   Int     @default(0)
-  cancelled   Int     @default(0)
-  
-  // Profile settings
-  phone       String?
-  address     String?
-  vehicleType String? // "bike", "bicycle", "car", etc.
-  
-  // Notification preferences
-  orderNotifications    Boolean @default(true)
-  messageNotifications  Boolean @default(true)
-  earningsNotifications Boolean @default(false)
-  promotionNotifications Boolean @default(false)
-  soundEnabled         Boolean @default(true)
-  
-  // Privacy settings
-  showPhoneToCustomers    Boolean @default(true)
-  showLocationWhenOnline  Boolean @default(true)
-  allowCustomerRatings    Boolean @default(true)
-  
-  // App preferences
-  language String @default("en")
-  theme    String @default("light") // "light", "dark", "auto"
-  
-  // Default working hours (used for time slots)
-  defaultStartTime String @default("09:00") // Format: "HH:mm"
-  defaultEndTime   String @default("22:00") // Format: "HH:mm"
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  deliveryPerson DeliveryPerson @relation(fields: [userId], references: [userId])
-  timeSlots DeliveryTimeSlot[]
-}
-
-model DeliveryTimeSlot {
-  id         String   @id @default(cuid())
-  deliveryId String
-  dayOfWeek  WeekDay
-  startTime  String   // Format: "HH:mm" (e.g., "09:00")
-  endTime    String   // Format: "HH:mm" (e.g., "22:00")
-  isActive   Boolean  @default(true)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  delivery DeliveryProfile @relation(fields: [deliveryId], references: [id])
-}
-
-model Order {
-  id         String        @id @default(cuid())
-  customerId String
-  status     OrderStatus   @default(PENDING)
-  totalPrice Float
-  deliveryAt DateTime?
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  assignedTo String?
-
-  customer   Customer          @relation("CustomerOrders", fields: [customerId], references: [userId])
-  foodItems  OrderFoodItem[]   // individual items from potentially different canteens
-  deliveryMan DeliveryPerson?  @relation("OrderDeliveryMan", fields: [assignedTo], references: [userId])
-
-  // Messaging relation (one order may have one or more conversations)
-  conversations Conversation[]
-  
-  // Notification relation
-  notifications Notification[]
-  
-  // Reports relation
-  reports       CustomerReport[]
-}
-
-model OrderFoodItem {
-  id        String       @id @default(cuid())
-  orderId   String
-  foodId    String
-  canteenId String
-  quantity  Int           @default(1)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
-  order    Order         @relation(fields: [orderId], references: [id])
-  food     CanteenFood   @relation(fields: [foodId], references: [id])
-  canteen  Canteen       @relation(fields: [canteenId], references: [id])
-  reports  CustomerReport[]
-}
-
-// --------------------------Messaging--------------------------
 
 enum MessageType {
   TEXT
@@ -299,122 +340,15 @@ enum MessageType {
   SYSTEM
 }
 
-model Conversation {
-  id         String    @id @default(cuid())
-  orderId    String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  order        Order?                   @relation(fields: [orderId], references: [id])
-  participants ConversationParticipant[]
-  messages     Message[]
-}
-
-model ConversationParticipant {
-  id             String   @id @default(cuid())
-  conversationId String
-  userId         String
-  joinedAt       DateTime @default(now())
-  lastReadAt     DateTime @default(now())
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id])
-
-  @@unique([conversationId, userId])
-}
-
-model Message {
-  id             String      @id @default(cuid())
-  conversationId String
-  senderId       String
-  type           MessageType @default(TEXT)
-  content        String
-  createdAt      DateTime    @default(now())
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation(fields: [senderId], references: [id])
-}
-
-
-
-// Voucher System
-model Voucher {
-  id          String   @id @default(cuid())
-  customerId  String
-  discount    Float
-  usageLimit  Int?     // null = unlimited
-  usedCount   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  customer Customer @relation(fields: [customerId], references: [userId])
-}
-
-// --------------------------Notifications--------------------------
-
 enum NotificationType {
-  ORDER_ASSIGNED       // When an order is assigned to delivery person
-  ORDER_CANCELLED      // When an order is cancelled
-  ORDER_READY          // When canteen marks order as ready for pickup
-  ORDER_UPDATE         // When order status is updated
-  URGENT_MESSAGE       // When someone sends urgent message
-  SYSTEM_ALERT         // System-wide alerts
-  PAYMENT_UPDATE       // Payment related notifications
-  REPORT_SUBMITTED     // When a customer submits a report
-}
-
-model Notification {
-  id          String           @id @default(cuid())
-  recipientId String          // User who receives the notification
-  senderId    String?         // User who triggered the notification (optional for system notifications)
-  type        NotificationType
-  title       String
-  content     String
-  isRead      Boolean         @default(false)
-  orderId     String?         // Related order if applicable
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-
-  // Relations
-  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id])
-  sender    User? @relation("NotificationSender", fields: [senderId], references: [id])
-  order     Order? @relation(fields: [orderId], references: [id])
-
-  @@index([recipientId, isRead])
-  @@index([createdAt])
-}
-
-model CustomerReport {
-  id          String   @id @default(cuid())
-  type        ReportType
-  title       String
-  description String?
-  status      ReportStatus @default(PENDING)
-  priority    ReportPriority @default(MEDIUM)
-  rating      Int?     // 1-5 star rating
-  response    String?  // Canteen's response to the report
-  
-  // Relations
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [userId])
-  
-  canteenId   String
-  canteen     Canteen  @relation(fields: [canteenId], references: [id])
-  
-  orderId     String?
-  order       Order?   @relation(fields: [orderId], references: [id])
-  
-  foodItemId  String?
-  foodItem    OrderFoodItem? @relation(fields: [foodItemId], references: [id])
-  
-  deliveryPersonId String?
-  deliveryPerson   DeliveryPerson? @relation(fields: [deliveryPersonId], references: [userId])
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("customer_reports")
+  ORDER_ASSIGNED
+  ORDER_CANCELLED
+  ORDER_READY
+  URGENT_MESSAGE
+  SYSTEM_ALERT
+  PAYMENT_UPDATE
+  ORDER_UPDATE
+  REPORT_SUBMITTED
 }
 
 enum ReportType {
@@ -439,6 +373,3 @@ enum ReportPriority {
   HIGH
   URGENT
 }
-
-
-

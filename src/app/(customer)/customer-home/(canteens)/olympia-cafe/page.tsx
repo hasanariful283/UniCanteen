@@ -61,7 +61,7 @@ const OlympiaCafePage = () => {
                     placeholder="Search Anything Here"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full max-w-xl px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                    className="w-full max-w-xl px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg"
                 />
             </div>
 
@@ -78,8 +78,8 @@ const OlympiaCafePage = () => {
                         onClick={() => setActiveCategory(cat)}
                         className={`px-5 py-2 rounded-full border font-medium transition ${
                             activeCategory === cat
-                                ? "bg-blue-100 text-blue-700 border-blue-400"
-                                : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+                                ? "bg-orange-100 text-orange-700 border-orange-400"
+                                : "bg-white text-orange-600 border-orange-200 hover:bg-orange-50"
                         }`}
                     >
                         {cat === "ALL"
@@ -143,7 +143,7 @@ const OlympiaCafePage = () => {
                                 {food.category.map((cat) => (
                                     <span
                                         key={cat}
-                                        className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium"
+                                        className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium"
                                     >
                                         {CATEGORY_LABELS[cat] ||
                                             cat.replace(/_/g, " ")}
@@ -156,7 +156,7 @@ const OlympiaCafePage = () => {
                                     <span>{food.rating ?? "5.0"}</span>
                                 </div>
                                 <button
-                                    className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-600 transition disabled:opacity-60"
+                                    className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-orange-600 transition disabled:opacity-60"
                                     disabled={
                                         !food.availability ||
                                         food.stocks === 0 ||
@@ -279,7 +279,7 @@ export default OlympiaCafePage;
 //               <p className="text-gray-600">{food.description}</p>
 //               <div className="flex flex-wrap gap-2 my-1">
 //                 {food.category.map((cat) => (
-//                   <span key={cat} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+//                   <span key={cat} className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium">
 //                     {cat.replace(/_/g, " ")}
 //                   </span>
 //                 ))}

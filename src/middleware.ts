@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { RoleType } from "./types/roles";
 
-const publicRoutes = createRouteMatcher(["/", "/sign-in", "/sign-up","/olympia-cafe","/neptune-cafe","/khans-kitchen","/api(.*)"]);
+const publicRoutes = createRouteMatcher(["/", "/sign-in", "/sign-up","/olympia-cafe","/neptune-cafe","/khans-kitchen","/api(.*)", "/reports", "/snacks", "/reviews","/language","/settings"]);
 const IsCanteenProtectedRoute = createRouteMatcher(["/canteen(.*)"]);
 const IsCustomerProtectedRoute = createRouteMatcher(["/customer(.*)"]);
 const IsDeliveryProtectedRoute = createRouteMatcher(["/delivery(.*)"]);

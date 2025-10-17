@@ -17,29 +17,54 @@ import { CustomerSideItems } from "@/config";
 
 export default function CusSideBar() {
     const navSections = CustomerSideItems();
-    const [isSidebarExpanded, setIsSidebarExpanded] = useState(() => {
-        if (typeof window !== "undefined") {
-            const saved = window.localStorage.getItem("sidebarExpanded");
-            if (saved === null) {
-                return true;
-            }
-            return JSON.parse(saved);
-        }
-        return true;
-    });
+    const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+    const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
-        if (typeof window !== "undefined") {
+        setIsClient(true);
+        const saved = window.localStorage.getItem("sidebarExpanded");
+        if (saved !== null) {
+            setIsSidebarExpanded(JSON.parse(saved));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (isClient) {
             window.localStorage.setItem(
                 "sidebarExpanded",
                 JSON.stringify(isSidebarExpanded)
             );
         }
-    }, [isSidebarExpanded]);
+    }, [isSidebarExpanded, isClient]);
 
     const toggleSidebar = () => {
         setIsSidebarExpanded(!isSidebarExpanded);
     };
+
+    // Prevent hydration mismatch by waiting for client-side rendering
+    if (!isClient) {
+        return (
+            <div className="pr-4">
+                <div
+                    className={cn(
+                        "w-[200px]", // Default expanded width during SSR
+                        "border-r transition-all duration-300 ease-in-out transform hidden sm:flex h-full bg-accent"
+                    )}
+                >
+                    <aside className="flex h-full flex-col w-full break-words px-4 overflow-x-hidden columns-1">
+                        {/* Skeleton loading state */}
+                        <div className="animate-pulse">
+                            <div className="h-4 bg-gray-200 rounded mb-2 mt-4"></div>
+                            <div className="space-y-2">
+                                <div className="h-8 bg-gray-100 rounded"></div>
+                                <div className="h-8 bg-gray-100 rounded"></div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="pr-4">

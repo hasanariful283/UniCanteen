@@ -23,6 +23,7 @@ export const HomeNavItems = () => {
     const pathname = usePathname();
 
     function isNavItemActive(pathname: string, nav: string) {
+        if (!pathname) return false; // Prevent errors during SSR
         return pathname.includes(nav);
     }
 
@@ -105,6 +106,7 @@ export const HomeNavItems = () => {
 export const DeliSideItems = () => {
     const pathname = usePathname();
     function isNavItemActive(pathname: string, nav: string) {
+        if (!pathname) return false; // Prevent errors during SSR
         return pathname.includes(nav);
     }
 
@@ -189,6 +191,7 @@ export const DeliSideItems = () => {
 export const CustomerSideItems = () => {
     const pathname = usePathname();
     function isNavItemActive(pathname: string, nav: string) {
+        if (!pathname) return false; // Prevent errors during SSR
         return pathname.includes(nav);
     }
 
@@ -299,6 +302,7 @@ export const CanSideItems = () => {
     const pathname = usePathname();
 
     function isNavItemActive(pathname: string, nav: string) {
+        if (!pathname) return false; // Prevent errors during SSR
         return pathname.includes(nav);
     }
 
@@ -334,6 +338,12 @@ export const CanSideItems = () => {
                     href: "/canteen-home/food-items/add-food",
                     icon: <Salad size={20} />,
                     active: isNavItemActive(pathname, "/canteen-home/food-items/add-food"),
+                },
+                {
+                    name: "Delete/Modify Foods",
+                    href: "/canteen-home/food-items/delete-modify-foods",
+                    icon: <Salad size={20} />,
+                    active: isNavItemActive(pathname, "/canteen-home/food-items/delete-modify-foods"),
                 },
                 {
                     name: "Food Availability",
