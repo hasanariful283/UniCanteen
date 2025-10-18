@@ -80,7 +80,7 @@ const OlympiaCafe = () => {
           placeholder="Search Anything Here"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-xl px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+          className="w-full max-w-xl px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg"
         />
       </div>
 
@@ -95,8 +95,8 @@ const OlympiaCafe = () => {
             onClick={() => setActiveCategory(cat)}
             className={`px-5 py-2 rounded-full border font-medium transition ${
               activeCategory === cat
-                ? "bg-blue-100 text-blue-700 border-blue-400"
-                : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+                ? "bg-orange-100 text-orange-700 border-orange-400"
+                : "bg-white text-orange-600 border-orange-200 hover:bg-orange-50"
             }`}
           >
             {cat === "ALL"
@@ -109,7 +109,7 @@ const OlympiaCafe = () => {
       {/* Food Cards */}
       {loading ? (
         <div className="flex flex-col items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-b-4  mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-400 border-b-4  mb-4"></div>
           <p className="text-lg text-gray-500">Loading foods...</p>
         </div>
       ) : filteredFoods.length === 0 ? (
@@ -128,12 +128,12 @@ const OlympiaCafe = () => {
               </div>
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">{food.name}</h2>
-                <span className="font-bold text-blue-500 text-lg">৳{food.price}</span>
+                <span className="font-bold text-orange-500 text-lg">৳{food.price}</span>
               </div>
               <p className="text-gray-600 text-sm">{food.description}</p>
               <div className="flex flex-wrap gap-2 my-1">
                 {food.category.map((cat) => (
-                  <span key={cat} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                  <span key={cat} className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium">
                     {CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}
                   </span>
                 ))}

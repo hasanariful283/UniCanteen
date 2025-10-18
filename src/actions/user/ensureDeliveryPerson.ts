@@ -1,9 +1,5 @@
 import prisma from "@/lib/prisma";
 
-/**
- * Ensures that a DeliveryPerson record exists for a given user
- * This function can be called to create missing DeliveryPerson records
- */
 export async function ensureDeliveryPersonRecord(userId: string, uiuId?: string) {
     try {
         // Check if user exists and is a delivery person
