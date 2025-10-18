@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Food, CATEGORY_LABELS } from "@/types/canteen";
+import { CheckCircle, X } from "lucide-react";
 
 const NeptuneCafePage = () => {
     const [foods, setFoods] = useState<Food[]>([]);
@@ -9,6 +10,8 @@ const NeptuneCafePage = () => {
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<string>("ALL");
     const [addingId, setAddingId] = useState<string | null>(null);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [addedItemName, setAddedItemName] = useState("");
 
     useEffect(() => {
         async function fetchFoods() {
@@ -181,8 +184,16 @@ const NeptuneCafePage = () => {
                                                     data.error ||
                                                         "Failed to add to cart"
                                                 );
+                                            } else {
+                                                // Show success popup
+                                                setAddedItemName(food.name);
+                                                setShowSuccessPopup(true);
+                                                
+                                                // Hide popup after 3 seconds
+                                                setTimeout(() => {
+                                                    setShowSuccessPopup(false);
+                                                }, 3000);
                                             }
-                                            // Optionally: show toast, update cart UI, etc.
                                         } catch (err) {
                                             alert("Failed to add to cart");
                                         } finally {
@@ -213,6 +224,55 @@ const NeptuneCafePage = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Success Popup */}
+            {showSuccessPopup && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl p-6 mx-4 max-w-md w-full transform transition-all border-2 border-orange-700">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-3">
+                                <div className="flex-shrink-0">
+                                    <CheckCircle className="h-8 w-8 text-green-500" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        Added to Cart!
+                                    </h3>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowSuccessPopup(false)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600">
+                                <span className="font-medium text-gray-900">{addedItemName}</span> has been successfully added to your cart.
+                            </p>
+                        </div>
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setShowSuccessPopup(false)}
+                                className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                            >
+                                Continue Shopping
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowSuccessPopup(false);
+                                    // You can add navigation to cart page here
+                                    window.location.href = '/customer-home/cart';
+                                }}
+                                className="flex-1 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                            >
+                                View Cart
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

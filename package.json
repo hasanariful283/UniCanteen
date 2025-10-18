@@ -13,7 +13,7 @@
         "seed": "tsx prisma/seed.ts"
     },
     "dependencies": {
-        "@clerk/nextjs": "^6.31.4",
+        "@clerk/nextjs": "^6.33.7",
         "@heroicons/react": "^2.2.0",
         "@prisma/client": "^6.16.1",
         "@prisma/extension-accelerate": "^2.0.2",

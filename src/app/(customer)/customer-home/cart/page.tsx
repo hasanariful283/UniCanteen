@@ -7,6 +7,25 @@ export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+
+    const handleImageError = (foodId: string) => {
+        setImageErrors(prev => new Set(prev).add(foodId));
+    };
+
+    const getImageSrc = (item: CartItem) => {
+        if (imageErrors.has(item.id) || !item.food?.image) {
+            return "/default-food.jpg";
+        }
+        
+        // Check if the image URL is valid
+        const imageUrl = item.food.image;
+        if (!imageUrl || imageUrl === "" || imageUrl.includes("undefined")) {
+            return "/default-food.jpg";
+        }
+        
+        return imageUrl;
+    };
 
     useEffect(() => {
         async function fetchCart() {
@@ -119,10 +138,7 @@ export default function CartPage() {
                                     <div className="relative w-32 h-32 ">
                                         <div className="relative w-32 h-32">
                                             <Image
-                                                src={
-                                                    item.food?.image ||
-                                                    "/default-food.jpg"
-                                                }
+                                                src={getImageSrc(item)}
                                                 alt={
                                                     item.food?.name ||
                                                     "Food Image"
@@ -130,6 +146,9 @@ export default function CartPage() {
                                                 fill
                                                 sizes="128px" // size of the image container
                                                 className="object-cover rounded-lg"
+                                                onError={() => handleImageError(item.id)}
+                                                placeholder="blur"
+                                                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R7Dh5+XvqsCpd5Sd03KRFSsmLvGWIXZmkdFjXqQoCKpJAG5+dz2WRmBznGOaMqDqcKQcEY4HaoO8fCfcZ5PW7LeFjHwB8X2OyJ3SsRlzrTF/3lFVBcFFDJYdHmfHXl6U2gDdBXd3fhyp6kV1FJj6fdZg8vKlxOBkTMHhLa5qoAhQc0pT9y24CjbH7cDWKNhWRD7rz9lNZkzq4j+LkJLFT9x6xaF7d5rPR0GXSEdhh5r2LL4LMLhRrLUl/sZM7j46lJemKZsrNt6OPo6HI1BhVvXvRsWxb38N0lPXnvHE2Hqk7C2dq1QhIYsiqOzIGb5rPGm/v6WxJZgMtLqjD/2Q=="
                                             />
                                         </div>
                                     </div>

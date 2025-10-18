@@ -4,18 +4,18 @@ import Image from "next/image";
 import { Food, CATEGORY_LABELS } from "@/types/canteen";
 import { CheckCircle, X } from "lucide-react";
 
-const OlympiaCafePage = () => {
+const KhansKitchenPage = () => {
     const [foods, setFoods] = useState<Food[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
-    const [activeCategory, setActiveCategory] = useState<string>("POPULAR");
+    const [activeCategory, setActiveCategory] = useState<string>("ALL");
     const [addingId, setAddingId] = useState<string | null>(null);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [addedItemName, setAddedItemName] = useState("");
 
     useEffect(() => {
         async function fetchFoods() {
-            const res = await fetch("/api/customer-home/olympia-foods");
+            const res = await fetch("/api/customer-home/khanskitchen-foods");
             const data = await res.json();
             setFoods(data);
             setLoading(false);
@@ -70,7 +70,7 @@ const OlympiaCafePage = () => {
 
             {/* Cafe Title */}
             <h1 className="text-4xl font-bold text-center mb-4 font-serif">
-                OlympiaCafe
+                Khans Kitchen
             </h1>
 
             {/* Category Tabs */}
@@ -96,10 +96,6 @@ const OlympiaCafePage = () => {
 
             {/* Category Section Title */}
             <div className="flex items-center gap-2 mb-4">
-                {/* Example icon for Popular */}
-                {activeCategory === "POPULAR" && (
-                    <span className="text-2xl">🍊</span>
-                )}
                 <h2 className="text-2xl font-bold">
                     {CATEGORY_LABELS[activeCategory] ||
                         activeCategory.replace(/_/g, " ")}
@@ -109,7 +105,7 @@ const OlympiaCafePage = () => {
             {/* Food Cards */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-400 border-b-4  mb-4"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-400 mb-4"></div>
                     <p className="text-lg text-gray-500">Loading foods...</p>
                 </div>
             ) : filteredFoods.length === 0 ? (
@@ -136,7 +132,7 @@ const OlympiaCafePage = () => {
                                     {food.name}
                                 </h2>
                                 <span className="font-bold text-orange-500 text-lg">
-                                    ৳{food.price}
+                                    {food.price} tk
                                 </span>
                             </div>
                             <p className="text-gray-600 text-sm">
@@ -233,7 +229,7 @@ const OlympiaCafePage = () => {
 
             {/* Success Popup */}
             {showSuccessPopup && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm ">
+                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl p-6 mx-4 max-w-md w-full transform transition-all border-2 border-orange-700">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
@@ -283,4 +279,4 @@ const OlympiaCafePage = () => {
     );
 };
 
-export default OlympiaCafePage;
+export default KhansKitchenPage;

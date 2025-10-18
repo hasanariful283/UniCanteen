@@ -10,7 +10,7 @@ type OrderItem = {
 
 type Order = {
   id: string;
-  status: "DELIVERED" | "CANCELLED" | "PENDING" | "ACCEPTED" | "IN_PROGRESS";
+  status: "DELIVERED" | "CANCELLED" | "PENDING" | "ACCEPTED" | "IN_PROGRESS" | "DELIVERING";
   totalPrice: number;
   createdAt: string;
   deliveryAt?: string | null;
@@ -21,6 +21,7 @@ const statusStyles: Record<Order["status"], string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
   ACCEPTED: "bg-orange-100 text-orange-800",
   IN_PROGRESS: "bg-purple-100 text-purple-800",
+  DELIVERING: "bg-blue-100 text-blue-800",
   DELIVERED: "bg-green-100 text-green-800",
   CANCELLED: "bg-red-100 text-red-800",
 };

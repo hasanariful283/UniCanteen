@@ -35,7 +35,10 @@ type Order = {
   deliveryAt?: string | null;
   foodItems: OrderItem[];
   customer?: { user?: { name?: string | null; email?: string } } | null;
-  deliveryMan?: { user?: { name?: string | null } } | null;
+  deliveryMan?: { 
+    user?: { name?: string | null; phone?: string | null } | null;
+    isAvailable?: boolean;
+  } | null;
   assignedTo?: string | null;
 };
 
@@ -118,6 +121,40 @@ export default function PendingOrders() {
     
     setFilteredOrders(filtered);
   }, [orders, searchTerm, statusFilter]);
+
+  async function acceptOrderWithAutoAssignment(orderId: string) {
+    if (!confirm("Are you sure you want to accept this order? A delivery person will be automatically assigned within 2 minutes.")) return;
+    
+    setProcessingOrder(orderId);
+    try {
+      const res = await fetch(`/api/canteen-home/orders/${orderId}/accept`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to accept order");
+      }
+      
+      const result = await res.json();
+      
+      // Update the local state immediately
+      setOrders(prev => prev.map(order => 
+        order.id === orderId ? { ...order, status: "ACCEPTED" } : order
+      ));
+      
+      // Show success message
+      alert("Order accepted! A delivery person will be automatically assigned within 2 minutes.");
+      
+      // Refetch to ensure we have the latest data
+      fetchOrders();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to accept order");
+    } finally {
+      setProcessingOrder(null);
+    }
+  }
 
   async function updateOrderStatus(orderId: string, newStatus: Order["status"]) {
     if (!confirm(`Are you sure you want to ${newStatus.toLowerCase()} this order?`)) return;
@@ -461,29 +498,44 @@ export default function PendingOrders() {
                     </div>
 
                     {/* Actions */}
-                    <div className="ml-6 flex flex-col space-y-2 min-w-[120px]">
+                    <div className="ml-6 flex flex-col space-y-2 min-w-[140px]">
                       {order.status === 'PENDING' && (
                         <>
                           <button
-                            onClick={() => updateOrderStatus(order.id, 'ACCEPTED')}
+                            onClick={() => acceptOrderWithAutoAssignment(order.id)}
                             disabled={isProcessing}
-                            className="flex items-center justify-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                            className="flex items-center justify-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium disabled:opacity-50"
                           >
                             {isProcessing ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
                             ) : (
                               <>
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Accept
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Accept & Auto-Assign
                               </>
                             )}
                           </button>
                           <button
+                            onClick={() => {
+                              // Accept order first, then show manual assignment
+                              updateOrderStatus(order.id, 'ACCEPTED').then(() => {
+                                fetchDeliveryPersons();
+                                setSelectedOrder(order);
+                                setShowDeliveryModal(true);
+                              });
+                            }}
+                            disabled={isProcessing}
+                            className="flex items-center justify-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-medium disabled:opacity-50"
+                          >
+                            <User className="w-3 h-3 mr-1" />
+                            Accept & Manual Assign
+                          </button>
+                          <button
                             onClick={() => updateOrderStatus(order.id, 'CANCELLED')}
                             disabled={isProcessing}
-                            className="flex items-center justify-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                            className="flex items-center justify-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-medium disabled:opacity-50"
                           >
-                            <XCircle className="w-4 h-4 mr-1" />
+                            <XCircle className="w-3 h-3 mr-1" />
                             Reject
                           </button>
                         </>
@@ -518,18 +570,45 @@ export default function PendingOrders() {
                             setShowDeliveryModal(true);
                           }}
                           disabled={isProcessing}
-                          className="flex items-center justify-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                          className="flex items-center justify-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-medium disabled:opacity-50"
                         >
-                          <User className="w-4 h-4 mr-1" />
+                          <User className="w-3 h-3 mr-1" />
                           Assign Rider
                         </button>
                       )}
 
                       {order.status === 'DELIVERING' && order.assignedTo && (
-                        <div className="flex items-center px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium">
-                          <User className="w-4 h-4 mr-1" />
-                          Rider Assigned
-                        </div>
+                        <>
+                          <div className="flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs font-medium">
+                            <User className="w-3 h-3 mr-1" />
+                            Rider Assigned
+                          </div>
+                          <button
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setShowDeliveryModal(true);
+                            }}
+                            disabled={isProcessing}
+                            className="flex items-center justify-center px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-xs font-medium disabled:opacity-50"
+                          >
+                            <User className="w-3 h-3 mr-1" />
+                            Change Rider
+                          </button>
+                        </>
+                      )}
+
+                      {(order.status === 'ACCEPTED' || order.status === 'IN_PROGRESS') && (
+                        <button
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setShowDeliveryModal(true);
+                          }}
+                          disabled={isProcessing}
+                          className="flex items-center justify-center px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-xs font-medium disabled:opacity-50"
+                        >
+                          <User className="w-3 h-3 mr-1" />
+                          Pre-Assign Rider
+                        </button>
                       )}
                       
                       <button
@@ -627,10 +706,12 @@ export default function PendingOrders() {
 
       {/* Delivery Assignment Modal */}
       {showDeliveryModal && selectedOrder && (
-        <div className="fixed inset-0  flex items-center justify-center z-50">
-          <div className="bg-orange-50 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Assign Delivery Person</h3>
+              <h3 className="text-lg font-semibold">
+                {selectedOrder.assignedTo ? "Change Delivery Person" : "Assign Delivery Person"}
+              </h3>
               <button
                 onClick={() => {
                   setShowDeliveryModal(false);
@@ -651,21 +732,46 @@ export default function PendingOrders() {
                 Total: ৳{selectedOrder.totalPrice.toFixed(2)}
               </p>
               
+              {/* Show current delivery person if assigned */}
+              {selectedOrder.assignedTo && selectedOrder.deliveryMan && selectedOrder.deliveryMan.user && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm font-medium text-blue-800 mb-1">Current Delivery Person:</p>
+                  <p className="text-sm text-blue-700">
+                    {selectedOrder.deliveryMan.user.name || 'N/A'} - {selectedOrder.deliveryMan.user.phone || 'N/A'}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Status: {selectedOrder.deliveryMan.isAvailable ? "Available" : "Busy"}
+                  </p>
+                </div>
+              )}
+              
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Delivery Person
+                {selectedOrder.assignedTo ? "Select New Delivery Person" : "Select Delivery Person"}
               </label>
               <select
                 value={selectedDeliveryPerson}
                 onChange={(e) => setSelectedDeliveryPerson(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="">Choose a rider...</option>
                 {deliveryPersons.map((person, idx) => (
-                  <option key={person.userId || idx} value={person.userId}>
+                  <option 
+                    key={person.userId || idx} 
+                    value={person.userId}
+                    disabled={person.userId === selectedOrder.assignedTo}
+                  >
                     {person.user.name} - {person.user.phone}
+                    {person.userId === selectedOrder.assignedTo ? " (Current)" : ""}
+                    {!person.isAvailable ? " (Busy)" : ""}
                   </option>
                 ))}
               </select>
+              
+              {selectedOrder.assignedTo && (
+                <p className="text-xs text-gray-500 mt-2">
+                  ⚠️ Changing the delivery person will notify both the current and new rider.
+                </p>
+              )}
             </div>
             
             <div className="flex justify-end space-x-3">
@@ -685,10 +791,13 @@ export default function PendingOrders() {
                     assignDeliveryPerson(selectedOrder.id, selectedDeliveryPerson);
                   }
                 }}
-                disabled={!selectedDeliveryPerson || assigningDelivery === selectedOrder.id}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                disabled={!selectedDeliveryPerson || assigningDelivery === selectedOrder.id || selectedDeliveryPerson === selectedOrder.assignedTo}
+                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
               >
-                {assigningDelivery === selectedOrder.id ? "Assigning..." : "Assign"}
+                {assigningDelivery === selectedOrder.id ? 
+                  (selectedOrder.assignedTo ? "Changing..." : "Assigning...") : 
+                  (selectedOrder.assignedTo ? "Change Rider" : "Assign Rider")
+                }
               </button>
             </div>
           </div>

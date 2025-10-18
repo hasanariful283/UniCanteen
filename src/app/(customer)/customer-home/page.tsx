@@ -9,16 +9,6 @@ import { useUser } from "@clerk/nextjs";
 import { Star, Utensils } from "lucide-react";
 import { Canteen, FeaturedItem } from "@/types/canteen";
 
-// type FeaturedItem = {
-//     id: string;
-//     bannerImage?: string;
-//     food: {
-//         name: string;
-//         price: number;
-//         description?: string;
-//         image?: string;
-//     };
-// };
 
 const CustomerHome = () => {
     const { user } = useUser();
