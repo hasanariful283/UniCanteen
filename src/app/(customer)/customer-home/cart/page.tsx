@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { CartItem } from "@/types/cart-types";
+import { useCart } from "@/contexts/CartContext";
 
 export default function CartPage() {
+    const { decrementCartCount, refreshCartCount } = useCart();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -46,6 +48,9 @@ export default function CartPage() {
     async function updateQuantity(cartItemId: string, nextQty: number) {
         // optimistic update
         const prev = cartItems;
+        const currentItem = cartItems.find(item => item.id === cartItemId);
+        const wasRemoved = nextQty === 0;
+        
         setUpdatingId(cartItemId);
         setCartItems((items) =>
             items
@@ -62,6 +67,11 @@ export default function CartPage() {
             });
             if (!res.ok) {
                 throw new Error((await res.json()).error || "Failed to update");
+            } else {
+                // If item was removed (quantity set to 0), update cart count
+                if (wasRemoved) {
+                    decrementCartCount();
+                }
             }
         } catch (e) {
             // rollback
@@ -84,6 +94,9 @@ export default function CartPage() {
             );
             if (!res.ok) {
                 throw new Error((await res.json()).error || "Failed to remove");
+            } else {
+                // Update cart count in navbar
+                decrementCartCount();
             }
         } catch (e) {
             setCartItems(prev);
@@ -102,6 +115,8 @@ export default function CartPage() {
             const { order } = await res.json();
             // Clear UI cart
             setCartItems([]);
+            // Reset cart count in navbar
+            refreshCartCount();
             // Optionally navigate to an order summary page later
             // router.push(`/orders/${order.id}`)
         } catch (e) {

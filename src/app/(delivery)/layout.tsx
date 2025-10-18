@@ -10,6 +10,8 @@ import { Exo } from "next/font/google";
 const exo = Exo({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"],
+    display: "swap",
+    variable: "--font-exo",
 });
 
 export const metadata: Metadata = {
@@ -26,8 +28,8 @@ export default function deliveryLayout({
 }) {
     return (
         <ClerkProvider>
-            <html lang="en">
-                <body className={exo.className}>
+            <html lang="en" className={exo.variable}>
+                <body className={`${exo.className} antialiased`} suppressHydrationWarning>
                     <DeliNavBar />
                     <div className="flex h-[calc(100vh-64px)]">
                         <DeliSideBar />

@@ -5,12 +5,15 @@ import type { Metadata } from "next";
 import "../globals.css";
 import CusNavBar from "@/components/forCustomer/CusNavBar";
 import CusSideBar from "@/components/forCustomer/CusSideBar";
+import { CartProvider } from "@/contexts/CartContext";
 
 // font Exo
 import { Exo } from "next/font/google";
 const exo = Exo({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"],
+    display: "swap",
+    variable: "--font-exo",
 });
 
 export const metadata: Metadata = {
@@ -27,15 +30,17 @@ export default function customerLayout({
 }) {
     return (
         <ClerkProvider>
-            <html lang="en">
-                <body className={exo.className}>
-                    <CusNavBar />
-                    <div className="flex h-[calc(100vh-64px)]">
-                        <CusSideBar />
-                        <main className="flex-1 bg-gray-50 dark:bg-gray-900 overflow-auto">
-                            {children}
-                        </main>
-                    </div>
+            <html lang="en" className={exo.variable}>
+                <body className={`${exo.className} antialiased`} suppressHydrationWarning>
+                    <CartProvider>
+                        <CusNavBar />
+                        <div className="flex h-[calc(100vh-64px)]">
+                            <CusSideBar />
+                            <main className="flex-1 bg-gray-50 dark:bg-gray-900 overflow-auto">
+                                {children}
+                            </main>
+                        </div>
+                    </CartProvider>
                 </body>
             </html>
         </ClerkProvider>

@@ -355,19 +355,19 @@ export default function PendingOrders() {
         </div>
         <div className="bg-white p-4 rounded-lg border">
           <div className="flex items-center">
-            <Package className="h-5 w-5 text-blue-600 mr-2" />
+            <Package className="h-5 w-5 text-purple-600 mr-2" />
             <div>
-              <p className="text-sm text-gray-600">In Progress</p>
+              <p className="text-sm text-gray-600">Preparing</p>
               <p className="text-xl font-semibold">{orders.filter(o => ['ACCEPTED', 'IN_PROGRESS'].includes(o.status)).length}</p>
             </div>
           </div>
         </div>
         <div className="bg-white p-4 rounded-lg border">
           <div className="flex items-center">
-            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+            <Truck className="h-5 w-5 text-blue-600 mr-2" />
             <div>
-              <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-xl font-semibold">{orders.filter(o => o.status === 'DELIVERED').length}</p>
+              <p className="text-sm text-gray-600">Delivering</p>
+              <p className="text-xl font-semibold">{orders.filter(o => o.status === 'DELIVERING').length}</p>
             </div>
           </div>
         </div>
@@ -375,8 +375,8 @@ export default function PendingOrders() {
           <div className="flex items-center">
             <span className="h-5 w-5 text-green-600 mr-2">৳</span>
             <div>
-              <p className="text-sm text-gray-600">Today's Orders</p>
-              <p className="text-xl font-semibold">{orders.length}</p>
+              <p className="text-sm text-gray-600">Total Value</p>
+              <p className="text-xl font-semibold">৳{orders.reduce((sum, order) => sum + order.totalPrice, 0).toFixed(0)}</p>
             </div>
           </div>
         </div>
@@ -401,12 +401,11 @@ export default function PendingOrders() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           >
-            <option value="all">All Status</option>
+            <option value="all">All Active Orders</option>
             <option value="PENDING">Pending</option>
             <option value="ACCEPTED">Accepted</option>
             <option value="IN_PROGRESS">In Progress</option>
-            <option value="DELIVERED">Delivered</option>
-            <option value="CANCELLED">Cancelled</option>
+            <option value="DELIVERING">Delivering</option>
           </select>
 
           <div className="text-sm text-gray-600 flex items-center">
@@ -482,6 +481,9 @@ export default function PendingOrders() {
                                 <div>
                                   <p className="font-medium text-gray-900">{item.food?.name || 'Unknown Item'}</p>
                                   <p className="text-sm text-gray-600">Quantity: {item.quantity || 0}</p>
+                                  {item.canteen?.name && (
+                                    <p className="text-xs text-blue-600">From: {item.canteen.name}</p>
+                                  )}
                                 </div>
                               </div>
                               <span className="font-medium text-gray-900">৳{((item.food?.price || 0) * (item.quantity || 0)).toFixed(2)}</span>
@@ -644,8 +646,8 @@ export default function PendingOrders() {
 
       {/* Order Details Modal */}
       {selectedOrder && !showDeliveryModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0  flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-orange-700">
             <div className="p-6 border-b">
               <h3 className="text-lg font-semibold">Order Details</h3>
               <button
@@ -681,13 +683,28 @@ export default function PendingOrders() {
                     )}
                   </div>
                 )}
+                {selectedOrder.assignedTo && selectedOrder.deliveryMan && (
+                  <div>
+                    <h4 className="font-medium">Delivery Person:</h4>
+                    <p className="text-gray-600">{selectedOrder.deliveryMan.user?.name || 'N/A'}</p>
+                    {selectedOrder.deliveryMan.user?.phone && (
+                      <p className="text-gray-500 text-sm">{selectedOrder.deliveryMan.user.phone}</p>
+                    )}
+                    <p className="text-xs text-gray-500">Status: {selectedOrder.deliveryMan.isAvailable ? "Available" : "Busy"}</p>
+                  </div>
+                )}
                 <div>
                   <h4 className="font-medium">Items:</h4>
                   <div className="space-y-2 mt-2">
                     {selectedOrder.foodItems.map((item) => (
                       <div key={item.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                        <span>{item.food.name} x {item.quantity}</span>
-                        <span>৳{(item.food.price * item.quantity).toFixed(2)}</span>
+                        <div>
+                          <span className="font-medium">{item.food.name} x {item.quantity}</span>
+                          {item.canteen?.name && (
+                            <p className="text-xs text-blue-600">From: {item.canteen.name}</p>
+                          )}
+                        </div>
+                        <span className="font-medium">৳{(item.food.price * item.quantity).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -706,8 +723,8 @@ export default function PendingOrders() {
 
       {/* Delivery Assignment Modal */}
       {showDeliveryModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0  flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-orange-700">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">
                 {selectedOrder.assignedTo ? "Change Delivery Person" : "Assign Delivery Person"}

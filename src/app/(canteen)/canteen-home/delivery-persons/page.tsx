@@ -58,6 +58,7 @@ export default function DeliveryPersonsPage() {
   const [deliveryPersons, setDeliveryPersons] = useState<DeliveryPerson[]>([]);
   const [stats, setStats] = useState<DeliveryStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "available" | "unavailable">("all");
   const [sortBy, setSortBy] = useState<"name" | "rating" | "deliveries" | "joined">("name");
@@ -73,10 +74,17 @@ export default function DeliveryPersonsPage() {
       const response = await fetch(`/api/canteen-home/delivery-persons?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setDeliveryPersons(data.deliveryPersons);
-        setStats(data.stats);
+        console.log('Delivery data received:', data); // Debug log
+        setDeliveryPersons(data.deliveryPersons || []);
+        setStats(data.stats || {});
+        setError(null);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.error || `Failed to load data (${response.status})`);
+        console.error('Failed to fetch delivery data:', response.status, errorData);
       }
     } catch (error) {
+      setError(error instanceof Error ? error.message : 'Network error');
       console.error('Error fetching delivery data:', error);
     } finally {
       setIsLoading(false);
@@ -150,6 +158,26 @@ export default function DeliveryPersonsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertCircle className="w-6 h-6 text-red-600" />
+            <h2 className="text-red-800 font-semibold">Error Loading Delivery Data</h2>
+          </div>
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={fetchDeliveryData}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -169,9 +197,9 @@ export default function DeliveryPersonsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm">Total Delivery Persons</p>
-              <p className="text-3xl font-bold">{stats?.totalDeliveryPersons || 0}</p>
+              <p className="text-3xl font-bold">{stats?.totalDeliveryPersons ?? 0}</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-full p-3">
+            <div className=" bg-opacity-20 rounded-full p-3">
               <Users className="w-6 h-6" />
             </div>
           </div>
@@ -181,9 +209,9 @@ export default function DeliveryPersonsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Available Now</p>
-              <p className="text-3xl font-bold">{stats?.availableNow || 0}</p>
+              <p className="text-3xl font-bold">{stats?.availableNow ?? 0}</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-full p-3">
+            <div className=" bg-opacity-20 rounded-full p-3">
               <Activity className="w-6 h-6" />
             </div>
           </div>
@@ -193,9 +221,9 @@ export default function DeliveryPersonsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-yellow-100 text-sm">Average Rating</p>
-              <p className="text-3xl font-bold">{stats?.averageRating?.toFixed(1) || "0.0"}</p>
+              <p className="text-3xl font-bold">{stats?.averageRating ? stats.averageRating.toFixed(1) : "0.0"}</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-full p-3">
+            <div className=" bg-opacity-20 rounded-full p-3">
               <Star className="w-6 h-6" />
             </div>
           </div>
@@ -205,9 +233,9 @@ export default function DeliveryPersonsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100 text-sm">Completed Today</p>
-              <p className="text-3xl font-bold">{stats?.completedToday || 0}</p>
+              <p className="text-3xl font-bold">{stats?.completedToday ?? 0}</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-full p-3">
+            <div className=" bg-opacity-20 rounded-full p-3">
               <Package className="w-6 h-6" />
             </div>
           </div>
@@ -290,23 +318,39 @@ export default function DeliveryPersonsPage() {
                         <h4 className="font-medium text-gray-900">
                           {person.user.name || "Unknown Delivery Person"}
                         </h4>
-                        {person.DeliveryProfile && getStatusBadge(person.DeliveryProfile.isAvailable)}
-                        {person.DeliveryProfile?.vehicleType && getVehicleIcon(person.DeliveryProfile.vehicleType)}
+                        {person.DeliveryProfile ? (
+                          <>
+                            {getStatusBadge(person.DeliveryProfile.isAvailable)}
+                            <div className="flex items-center gap-1">
+                              {getVehicleIcon(person.DeliveryProfile.vehicleType)}
+                              <span className="text-xs text-gray-500">
+                                {person.DeliveryProfile.vehicleType || 'No vehicle'}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            <AlertCircle className="w-3 h-3" />
+                            Profile Incomplete
+                          </span>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-4 text-sm text-gray-500">
-                        {person.user.phone && (
+                        <div className="flex items-center gap-1">
+                          <Phone className="w-4 h-4" />
+                          {person.user.phone || person.DeliveryProfile?.phone || 'No phone'}
+                        </div>
+                        {person.user.email && (
                           <div className="flex items-center gap-1">
-                            <Phone className="w-4 h-4" />
-                            {person.user.phone}
+                            <User className="w-4 h-4" />
+                            {person.user.email}
                           </div>
                         )}
-                        {person.DeliveryProfile?.address && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            {person.DeliveryProfile.address}
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {person.DeliveryProfile?.address || 'No address'}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -320,23 +364,25 @@ export default function DeliveryPersonsPage() {
                     <div className="text-center">
                       <p className="text-sm text-gray-500">Completed</p>
                       <p className="font-medium text-gray-900">
-                        {person.DeliveryProfile?.completed || 0}
+                        {person.DeliveryProfile?.completed ?? 0}
                       </p>
                     </div>
 
                     <div className="text-center">
                       <p className="text-sm text-gray-500">Success Rate</p>
                       <p className="font-medium text-gray-900">
-                        {person.DeliveryProfile?.completed || 0 > 0 
-                          ? (((person.DeliveryProfile?.completed || 0) / 
-                             ((person.DeliveryProfile?.completed || 0) + (person.DeliveryProfile?.cancelled || 0))) * 100).toFixed(0)
-                          : "0"}%
+                        {(() => {
+                          const completed = person.DeliveryProfile?.completed || 0;
+                          const cancelled = person.DeliveryProfile?.cancelled || 0;
+                          const total = completed + cancelled;
+                          return total > 0 ? ((completed / total) * 100).toFixed(0) : "0";
+                        })()}%
                       </p>
                     </div>
 
                     <div className="text-center">
                       <p className="text-sm text-gray-500">Total Orders</p>
-                      <p className="font-medium text-gray-900">{person._count.deliveries}</p>
+                      <p className="font-medium text-gray-900">{person._count?.deliveries ?? 0}</p>
                     </div>
 
                     <button className="p-2 hover:bg-gray-200 rounded-lg">

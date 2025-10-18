@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Food, CATEGORY_LABELS } from "@/types/canteen";
 import { CheckCircle, X } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 const OlympiaCafePage = () => {
+    const { incrementCartCount } = useCart();
     const [foods, setFoods] = useState<Food[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -192,6 +194,9 @@ const OlympiaCafePage = () => {
                                                 // Show success popup
                                                 setAddedItemName(food.name);
                                                 setShowSuccessPopup(true);
+                                                
+                                                // Update cart count in navbar
+                                                incrementCartCount();
                                                 
                                                 // Hide popup after 3 seconds
                                                 setTimeout(() => {

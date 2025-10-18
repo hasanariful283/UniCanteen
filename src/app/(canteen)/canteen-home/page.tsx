@@ -217,10 +217,7 @@ export default function CanteenHome() {
                               <Eye className="h-5 w-5 text-green-600 mr-3" />
                               <span className="font-medium text-green-700">Manage Availability</span>
                           </Link>
-                          <Link href="/canteen-home/reports" className="flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-                              <TrendingUp className="h-5 w-5 text-purple-600 mr-3" />
-                              <span className="font-medium text-purple-700">View Analytics</span>
-                          </Link>
+                          
                       </div>
                   </div>
               </div>

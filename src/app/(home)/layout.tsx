@@ -16,6 +16,8 @@ import HomeSideBar from "@/components/forHome/HomeSideBar";
 const exo = Exo({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"],
+    display: "swap",
+    variable: "--font-exo",
 });
 
 export const metadata: Metadata = {
@@ -30,8 +32,8 @@ export default function RootLayout({
 }>) {
     return (
         <ClerkProvider>
-            <html lang="en">
-                <body className={exo.className}>
+            <html lang="en" className={exo.variable}>
+                <body className={`${exo.className} antialiased`} suppressHydrationWarning>
                     <HomeNavBar />
                     <div className="flex h-[calc(100vh-64px)]">
                         <HomeSideBar />

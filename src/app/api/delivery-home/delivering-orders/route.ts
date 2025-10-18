@@ -87,6 +87,22 @@ export async function PATCH(request: Request) {
         deliveryAt: new Date(),
       };
 
+      // Update delivery person's completed count
+      await prisma.deliveryProfile.upsert({
+        where: { userId: userId },
+        create: {
+          userId: userId,
+          isAvailable: true,
+          completed: 1,
+          cancelled: 0,
+        },
+        update: {
+          completed: { increment: 1 },
+        },
+      });
+
+      console.log(`✅ Incremented completed count for delivery person: ${userId}`);
+
       // Create notification for customer
       await prisma.notification.create({
         data: {

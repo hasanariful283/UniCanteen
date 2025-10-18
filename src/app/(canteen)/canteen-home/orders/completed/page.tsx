@@ -203,7 +203,7 @@ export default function CompletedOrders() {
               <div className="text-sm text-gray-600">
                 {order.deliveryMan?.user?.name ? (
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <CheckCircle className="w-4 h-4 text-orange-500" />
                     <span>Delivery by {order.deliveryMan.user.name}</span>
                   </div>
                 ) : order.assignedTo ? (
@@ -239,7 +239,7 @@ export default function CompletedOrders() {
                 {order.assignedTo && (
                   <button
                     onClick={() => startConversationWithDelivery(order.id, order.assignedTo!)}
-                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg flex items-center gap-1 transition-colors"
+                    className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg flex items-center gap-1 transition-colors"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Message Delivery
