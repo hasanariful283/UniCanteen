@@ -4,6 +4,9 @@
 generator client {
   provider = "prisma-client" // Changed from "prisma-client-js"
   output   = "../src/generated"
+  // Add these two lines to fix enum exports:
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
 }
 
 datasource db {
