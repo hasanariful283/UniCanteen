@@ -1,3 +1,4 @@
+// Create new order from cart items with payment processing
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";

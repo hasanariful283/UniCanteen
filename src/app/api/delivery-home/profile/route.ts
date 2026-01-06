@@ -1,3 +1,4 @@
+// Delivery person profile management and settings API
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';

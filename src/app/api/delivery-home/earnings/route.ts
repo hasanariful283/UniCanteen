@@ -1,3 +1,4 @@
+// Delivery person earnings tracking and financial overview
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";

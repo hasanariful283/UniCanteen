@@ -1,3 +1,4 @@
+// Theme toggle component for switching between light and dark modes
 "use client";
 
 import React, { useEffect, useState } from "react";

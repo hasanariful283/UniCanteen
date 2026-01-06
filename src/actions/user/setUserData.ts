@@ -1,3 +1,4 @@
+// User data management and database operations
 import { RoleType } from "@/types/roles";
 import prisma from "@/lib/prisma";
 
@@ -5,7 +6,7 @@ export interface UserData {
     userId: string;
     email: string;
     name: string | null;
-    phone: string | null;
+    phone: string | null; // Add phone field for user contact
     role: RoleType;
     studentId?: string | null;
 }

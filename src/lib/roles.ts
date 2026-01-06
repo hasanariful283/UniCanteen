@@ -1,3 +1,4 @@
+// Role checking utilities with Clerk authentication
 import { Roles } from '@/types/globals'
 import { auth } from '@clerk/nextjs/server'
 

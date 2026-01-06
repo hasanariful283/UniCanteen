@@ -1,3 +1,4 @@
+// Customer navigation bar with cart, profile, and theme toggle
 "use client";
 
 import Link from "next/link";

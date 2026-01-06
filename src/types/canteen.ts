@@ -1,3 +1,4 @@
+// Canteen name enum and type definitions
 export enum CanteenName {
     OLYMPIA_CAFE = "OLYMPIA_CAFE",
     NEPTUNE_CAFE = "NEPTUNE_CAFE",

@@ -1,3 +1,4 @@
+// API endpoints for fetching and managing canteen reviews
 "use server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";

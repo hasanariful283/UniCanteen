@@ -1,3 +1,4 @@
+// Food item type definitions for canteen menu
 /*
 model CanteenFood {
   canteenId   String   @id

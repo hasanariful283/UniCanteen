@@ -1,3 +1,4 @@
+// Shopping cart page with item management and checkout functionality
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";

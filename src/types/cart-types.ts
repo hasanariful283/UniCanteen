@@ -1,3 +1,4 @@
+// Shopping cart item type definition
 export type CartItem = {
     id: string;
     quantity: number;

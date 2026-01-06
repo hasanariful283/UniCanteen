@@ -1,3 +1,4 @@
+// Customer profile settings page with phone, name, and account management
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';

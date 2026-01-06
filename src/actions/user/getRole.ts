@@ -1,3 +1,4 @@
+// Fetch user role from API endpoint
 import { RoleType } from '@/types/roles';
 
 export async function getRole(): Promise<RoleType> {

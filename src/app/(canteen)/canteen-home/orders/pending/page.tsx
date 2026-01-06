@@ -1,3 +1,4 @@
+// Canteen pending orders management with accept and reject actions
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";

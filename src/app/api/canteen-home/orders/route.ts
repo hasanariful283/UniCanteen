@@ -1,8 +1,7 @@
+// Canteen owner order management API with pagination and filters
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 // GET orders for canteen
 export async function GET(request: NextRequest) {

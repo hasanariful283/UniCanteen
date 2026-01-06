@@ -1,3 +1,4 @@
+// Public API endpoint for listing all available canteens
 "use server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";

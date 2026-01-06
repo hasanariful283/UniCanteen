@@ -1,3 +1,4 @@
+// Customer home dashboard with featured items carousel and canteen listings
 "use client";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";

@@ -1,3 +1,4 @@
+// Fetch featured food items displayed on customer home page
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 

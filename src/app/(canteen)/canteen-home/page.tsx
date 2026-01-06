@@ -1,3 +1,4 @@
+// Canteen owner dashboard with orders, revenue, and analytics overview
 "use client"
 
 import { useAuth } from "@clerk/nextjs";

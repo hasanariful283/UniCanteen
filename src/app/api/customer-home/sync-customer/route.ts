@@ -1,3 +1,4 @@
+// Sync customer data with database including phone and profile info
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 

@@ -1,3 +1,4 @@
+// Server actions for canteen food availability management
 "use server";
 import prisma from "@/lib/prisma";
 export async function changeFoodAvailability(

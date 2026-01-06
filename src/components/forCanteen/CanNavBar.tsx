@@ -1,3 +1,4 @@
+// Canteen owner navigation bar with notifications and settings
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";

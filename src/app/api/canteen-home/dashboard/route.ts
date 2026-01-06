@@ -1,3 +1,4 @@
+// Canteen dashboard analytics with revenue, orders, and performance metrics
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';

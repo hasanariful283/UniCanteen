@@ -1,3 +1,4 @@
+// Navigation configuration and menu items for all user roles
 import { usePathname } from "next/navigation";
 import {
     Home,
