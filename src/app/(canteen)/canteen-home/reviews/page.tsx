@@ -276,7 +276,7 @@ export default function ReviewsPage() {
               <div key={review.id} className="p-6 hover:bg-gray-50">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
                       {review.customer.user.name?.charAt(0) || "U"}
                     </div>
                     <div>
