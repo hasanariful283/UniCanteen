@@ -130,7 +130,7 @@ const EarningsPage = () => {
 
             {/* Earnings Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 rounded-lg text-white">
+                <div className="bg-linear-to-r from-green-500 to-green-600 p-6 rounded-lg text-white">
                     <div className="flex items-center gap-3 mb-2">
                         <Wallet className="w-6 h-6" />
                         <h3 className="font-medium">{getPeriodLabel()}</h3>

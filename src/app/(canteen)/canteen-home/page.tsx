@@ -147,7 +147,7 @@ export default function CanteenHome() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                       <div className="flex items-center">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                               <Package className="h-8 w-8 text-blue-600" />
                           </div>
                           <div className="ml-4">
@@ -160,7 +160,7 @@ export default function CanteenHome() {
 
                   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                       <div className="flex items-center">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                               <ShoppingCart className="h-8 w-8 text-orange-600" />
                           </div>
                           <div className="ml-4">
@@ -173,7 +173,7 @@ export default function CanteenHome() {
 
                   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                       <div className="flex items-center">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                               <DollarSign className="h-8 w-8 text-green-600" />
                           </div>
                           <div className="ml-4">
@@ -186,7 +186,7 @@ export default function CanteenHome() {
 
                   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                       <div className="flex items-center">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                               <Star className="h-8 w-8 text-yellow-600" />
                           </div>
                           <div className="ml-4">
@@ -272,12 +272,12 @@ export default function CanteenHome() {
                       <div className="space-y-4">
                           {topSellingItems.map((item, index) => (
                               <div key={item.id} className="flex items-center space-x-4">
-                                  <div className="flex-shrink-0">
+                                  <div className="shrink-0">
                                       <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                                           <span className="text-orange-600 font-bold">#{index + 1}</span>
                                       </div>
                                   </div>
-                                  <div className="flex-grow">
+                                  <div className="grow">
                                       <p className="font-medium text-gray-900">{item.name}</p>
                                       <p className="text-sm text-gray-500">৳{item.price} • {item.totalSold} sold</p>
                                   </div>

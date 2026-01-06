@@ -481,7 +481,7 @@ const DeliveryHome = () => {
                                     }`}
                                     onClick={() => !notification.isRead && markNotificationAsRead(notification.id)}
                                 >
-                                    <span className="text-sm text-gray-600 font-medium min-w-[20px]">
+                                    <span className="text-sm text-gray-600 font-medium min-w-5">
                                         {index + 1}.
                                     </span>
                                     <div className="flex-1">

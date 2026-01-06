@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-
+// all okay phme
 const nextConfig: NextConfig = {
     images: {
         remotePatterns: [

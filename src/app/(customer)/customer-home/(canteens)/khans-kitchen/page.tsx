@@ -238,7 +238,7 @@ const KhansKitchenPage = () => {
                     <div className="bg-white rounded-lg shadow-xl p-6 mx-4 max-w-md w-full transform transition-all border-2 border-orange-700">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
-                                <div className="flex-shrink-0">
+                                <div className="shrink-0">
                                     <CheckCircle className="h-8 w-8 text-green-500" />
                                 </div>
                                 <div>

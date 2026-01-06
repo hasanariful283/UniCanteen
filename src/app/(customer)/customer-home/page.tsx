@@ -109,7 +109,7 @@ const CustomerHome = () => {
                                         key={item.id}
                                         className="flex-[0_0_100%] min-w-0"
                                     >
-                                        <div className="relative h-[400px] rounded-xl overflow-hidden">
+                                        <div className="relative h-100 rounded-xl overflow-hidden">
                                             <Image
                                                 src={
                                                     item.bannerImage ||
@@ -122,7 +122,7 @@ const CustomerHome = () => {
                                                 sizes="100vw"
                                                 priority={index === 0}
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
                                             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                                                 <p className="text-lg font-medium text-gray-200">
                                                     {item.food.name}

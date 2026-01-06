@@ -3,7 +3,7 @@ import { changeFoodAvailability } from "@/actions/canteen/canteen.action";
 import { Button } from "@/components/ui/button";
 import { CanteenFood } from "@/types/food";
 import React, { useEffect, useRef, useState } from "react";
-import { FoodCategory } from "@prisma/client";
+import { FoodCategory } from "@/generated/client";
 const FOOD_CATEGORIES: FoodCategory[] = [
     "POPULAR",
     "BREAKFAST",

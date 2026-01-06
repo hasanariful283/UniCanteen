@@ -61,7 +61,7 @@ const CusNavBar = () => {
                         <ShoppingBagIcon className="w-10 h-10" />
                     </Link>
                     {cartItemsCount > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
                             {cartItemsCount > 99 ? '99+' : cartItemsCount}
                         </span>
                     )}

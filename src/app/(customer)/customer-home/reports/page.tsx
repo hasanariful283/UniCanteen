@@ -552,7 +552,7 @@ const CustomerReportsPage = () => {
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                   <div className="flex-1">
                     <div className="flex items-start space-x-3">
-                      <div className={`p-2 rounded-lg ${getReportTypeColor(report.type)} text-white flex-shrink-0`}>
+                      <div className={`p-2 rounded-lg ${getReportTypeColor(report.type)} text-white shrink-0`}>
                         <TypeIcon className="w-5 h-5" />
                       </div>
                       

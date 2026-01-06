@@ -207,7 +207,7 @@ const CustomerReviews = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg shadow-lg text-white p-8">
+      <div className="bg-linear-to-r from-orange-600 to-red-600 rounded-lg shadow-lg text-white p-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <MessageSquare className="w-12 h-12" />
@@ -347,7 +347,7 @@ const CustomerReviews = () => {
             <div key={review.id} className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-start space-x-4">
                 {/* Canteen Image */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
                     {review.canteen.canteen_image ? (
                       <Image

@@ -16,7 +16,7 @@ model CanteenFood {
 }
 */
 
-import { FoodCategory } from "@prisma/client";
+import { FoodCategory } from "@/generated/client";
 
 export interface CanteenFood {
   id: string;

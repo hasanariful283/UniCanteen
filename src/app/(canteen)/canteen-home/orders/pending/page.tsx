@@ -501,7 +501,7 @@ export default function PendingOrders() {
                     </div>
 
                     {/* Actions */}
-                    <div className="ml-6 flex flex-col space-y-2 min-w-[140px]">
+                    <div className="ml-6 flex flex-col space-y-2 min-w-35">
                       {order.status === 'PENDING' && (
                         <>
                           <button

@@ -22,5 +22,5 @@ const eslintConfig = [
     },
   }),
 ]
-
+// working on nextjs16
 export default eslintConfig;

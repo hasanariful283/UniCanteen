@@ -124,7 +124,7 @@ const SnacksPage = () => {
   return (
     <div className="mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-600 to-red-400 rounded-lg shadow-lg text-white p-8">
+      <div className="bg-linear-to-r from-orange-600 to-red-400 rounded-lg shadow-lg text-white p-8">
         <div className="flex items-center space-x-4">
           <Zap className="w-12 h-12" />
           <div>

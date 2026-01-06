@@ -150,7 +150,7 @@ export default function CartPage() {
                                 key={item.id}
                                 className="flex gap-4 bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition relative"
                             >
-                                <div className="w-28 h-28 relative flex-shrink-0 mr-4 mb-4">
+                                <div className="w-28 h-28 relative shrink-0 mr-4 mb-4">
                                     <div className="relative w-32 h-32 ">
                                         <div className="relative w-32 h-32">
                                             <Image
@@ -259,7 +259,7 @@ export default function CartPage() {
 
 
                     {/* Order Summary */}
-                    <div className="mt-6 lg:mt-0 lg:w-80 flex-shrink-0 bg-white rounded-xl shadow-md p-6 sticky top-6 h-fit">
+                    <div className="mt-6 lg:mt-0 lg:w-80 shrink-0 bg-white rounded-xl shadow-md p-6 sticky top-6 h-fit">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">
                             Order Summary
                         </h2>
