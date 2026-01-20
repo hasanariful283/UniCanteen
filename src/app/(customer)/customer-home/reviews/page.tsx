@@ -358,7 +358,7 @@ const CustomerReviews = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+                      <div className="w-full h-full bg-linear-to-br from-orange-400 to-red-500 flex items-center justify-center">
                         <MessageSquare className="w-8 h-8 text-white" />
                       </div>
                     )}
