@@ -60,17 +60,17 @@ export default function VoucherPage() {
         const v = data.voucher;
         if (!v) {
             return (
-                <div className="rounded-lg border p-4 bg-white">
+                <div className="rounded-lg border p-4 bg-orange-400">
                     <h2 className="text-lg font-semibold mb-1">
                         No Voucher Yet
                     </h2>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-black-600">
                         You have placed {orders} orders.
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-black-600 mt-1">
                         Place more orders to unlock vouchers:
                     </p>
-                    <ul className="list-disc list-inside text-sm text-gray-600 mt-1">
+                    <ul className="list-disc list-inside text-sm text-black-600 mt-1">
                         <li>More than 5 orders: 10% off</li>
                         <li>More than 10 orders: 20% off</li>
                     </ul>
@@ -109,7 +109,7 @@ export default function VoucherPage() {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-4">Voucher</h1>
+            <h1 className="text-4xl font-bold mb-4 hover:bg-orange-500">Voucher</h1>
             {content}
         </div>
     );
